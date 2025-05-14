@@ -1,0 +1,68 @@
+{% include "ccstore/base.html" %}
+
+
+{% load static %}
+
+
+{% block content %}
+
+
+
+    <body>
+
+        <br>
+    
+        <div class="login-card">
+            <div class="login-header"></div>
+            <div class="login-body">
+                <div class="text-center">
+                    <h4>Make Payment</h4>
+
+                    <p>
+                        you are about to make a payment of <strong>{{ total_cost }}</strong> for your order with reference <strong>{{ payment.ref }} </strong> email of this user <strong> {{ email }} </strong>
+                            and the product items are {{ item }}
+                    </p>
+
+                    <br>
+                    <button onclick="payWithPaystack()" class="btn btn-primary">Pay with Paystack</button>             
+                </div>
+            </div>
+        </div>
+    </body>
+
+    
+
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <script>
+        function payWithPaystack() {
+            
+            let paystack = PaystackPop.setup({
+                key: "{{ PAYSTACK_PK }}",
+                email: "{{ email }}", // Replace with your customer's email
+                amount: "{{ total_cost }}" * 100,  // Convert to kobo (Paystack requires amount in kobo)
+                ref: "{{ payment.ref }}", // Replace with your unique reference
+
+                onClose: function() {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Payment Cancelled',
+                        text: 'You closed the payment window.',
+                    });
+                },
+
+                callback: function(response) {
+                    console.log(response);
+                    window.location.href = "{% url 'verify_payment' payment.ref %}";
+                }
+            });
+
+            paystack.openIframe();
+        }
+    </script>
+
+
+</body>
+
+{% endblock %}

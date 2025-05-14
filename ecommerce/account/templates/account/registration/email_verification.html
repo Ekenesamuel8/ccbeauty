@@ -1,0 +1,12 @@
+{% autoescape off %}
+
+hey!
+
+thanks for signing up for an account with us!
+
+to verify your email address, please click the link below:
+
+http://{{ domain }}{% url 'email_verification' uidb64=uid token=token %}
+
+
+{% endautoescape %}

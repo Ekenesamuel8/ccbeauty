@@ -1,0 +1,68 @@
+{% include "ccstore/base.html" %}
+
+
+{% load static %}    
+
+
+{% block content %}
+
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h3>My Ccbeauty Account</h3>
+                <a href="{%url 'profile_account'%}">Profile</a>
+                <a href="#">Orders</a>
+                <a href="#">Inbox <span class="badge bg-danger">10</span></a>
+                <a href="{%url 'manage_shipping_address'%}">Manage shipping address</a>
+                <a href="{%url 'store'%}">Logout</a>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 content">
+                <!-- Account Overview -->
+                <div class="content-section">
+                    <h4>Account Overview</h4>
+
+                    <!-- Account Details -->
+                    <div class="content-section">
+                        <div class="section-title">Account Details</div>
+                        <br>
+                        <div class="section-content">
+                            <div class="align-items-center">
+                                <!-- Display Profile Image if Available -->
+                                <img src="{{ profile_picture.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+
+                                <div>
+                                    <br>
+                                    <p>welcome <strong> {{user}}!</strong></p>
+                                    <p>full name: {{ user.first_name }} {{ user.last_name }}</p>
+                                    <p>email: {{user.email}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Book -->
+                    
+                    <div class="content-section">
+                        <div class="section-title">Address Book</div>
+                        <br>
+                        <div class="section-content">
+                            <p>Your default shipping address:</p>
+                            <p>address: {{ address }}</p>
+                            <p>phone number: {{ user_details.phone }}</p>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+{% endblock %}

@@ -1,0 +1,131 @@
+
+{% include "ccstore/base.html" %}
+
+
+{% load static %}
+
+
+{% block content %}
+
+<body>
+
+    <div class="login-card">
+        <div class="login-header"></div>
+        <div class="login-body">
+            <form id="form">
+
+                <div>
+
+                    <h3> <i class="fa fa-chevron-circle-right" aria-hidden="true"></i> &nbsp; Complete your order </h3>
+
+                    <p> Please enter in the relevant information below. </p>
+ 
+                    <hr>
+                    <br>
+
+                    <div class="form-field">                   
+                        <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off" value="{{shipping_address.fullname}}" required>
+                    </div>
+
+                    <br>
+
+                    <div class="form-field">
+                        <input class="form-control validate" id="email" type="email" placeholder="Email address*" autocomplete="off" value="{{shipping_address.email}}" required>
+                    </div>
+                    
+                    <br>
+                    
+                    <div class="form-field">
+                        <input class="form-control validate" id="address1" type="text" placeholder="Address 1*" autocomplete="off" value="{{shipping_address.address1}}" required>
+                    </div>
+
+                    <br>
+
+                    <div class="form-field">
+                        <input class="form-control validate" id="address2" type="text" placeholder="Address 2*" autocomplete="off" value="{{shipping_address.address2}}" required>
+                    </div>
+
+                    <br>
+
+                    <div class="form-field">
+                        <input class="form-control validate" id="city" type="text" placeholder="City*" autocomplete="off" value="{{shipping_address.city}}" required>
+                    </div>
+
+                    <br>
+
+                    <div class="form-field">
+                        <input class="form-control" id="state" type="text" placeholder="State (Optional)" autocomplete="off" value="{{shipping_address.state}}">
+                    </div>
+
+                    <br>
+
+                    <div class="form-field">
+                        <input class="form-control" id="zipcode" type="text" placeholder="Zip code (Optional)" autocomplete="off" value="{{shipping_address.zipcode}}">
+                    </div>
+            
+                </div>
+
+                <br>
+
+               <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
+               
+                <br>
+
+            </form>
+
+            <br>
+
+        </div>
+
+    </div>
+
+        <br>
+
+    </body>
+    
+    <script>
+   
+        $ (document).on('submit', function(e){
+    
+            e.preventDefault();
+
+            $('#complete-order').prop('disabled', true).text('Processing...');
+    
+            $.ajax({
+    
+                type: 'POST',
+    
+                url: '{% url "orders" %}',
+    
+                data: {
+    
+                    fullname: $('#name').val(),
+                    email: $('#email').val(),
+                    address1: $('#address1').val(),
+                    address2: $('#address2').val(),
+                    city: $('#city').val(),
+                    state: $('#state').val(),
+                    zipcode: $('#Zipcode').val(),
+
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+    
+                    action: 'post'
+    
+                }, 
+                success: function(json){
+                    window.location.replace('{% url "makepayment" %}');
+                
+                },
+    
+                error: function(xhr, errmsg, err){
+
+                    window.location.replace('{% url "checkout" %}');
+    
+                }
+    
+            });
+        })
+    </script>
+
+
+{% endblock %}

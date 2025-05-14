@@ -1,0 +1,51 @@
+{% extends "./base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+<main>
+  
+  <div class="album py-5 bg-light">
+    <div class="container-fluid px-4">
+
+      <div class="pb-3 h5"> {{category.name}} </div>
+
+
+      <hr>
+
+      <br>
+
+
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 mx-0 g-3 bg-white">
+
+        <!-- for product in products -->
+        {% for product in products %}
+
+        <div class="col">
+          <div class="card bg-white shadow-sm h-100 text-center border-0">
+          <img class="img-fluid" alt="Responsive image" src="{{product.image.url}}">
+
+            <div class="card-body">
+              <p class="card-text text-muted text-capitalize">
+                <a class="text-info text-decoration-none" href="{{product.get_absolute_url}}"> {{product.title}} </a>
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <h5> &#8358; {{product.price}} </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        <!-- end for -->
+
+      </div>
+    </div>
+  </div>
+
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% include "ccstore/base.html" %}
+
+
+{% load static %}    
+
+
+{% block content %}
+
+<body>
+
+    <div class="login-card">
+        <div class="login-header"></div>
+        <div class="login-body">
+            <h4>are you sure you want to delete your profile</h4>
+
+            <form method="POST" autocomplete="off">
+
+                {% csrf_token %}
+                <br>
+
+                <button type="submit" class="btn btn-primary btn-login w-100 text-white fw-bold"> delete </button>
+
+            </form>
+        </div>
+    </div>
+</body>
+
+
+
+
+{% endblock %}

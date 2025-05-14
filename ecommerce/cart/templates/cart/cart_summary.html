@@ -1,0 +1,225 @@
+{% include "ccstore/base.html" %}
+
+
+{% load static %}
+
+{% load mathfilters %}
+
+
+{% block content %}
+
+
+<main class="pt-5">
+    
+    <div class="container">
+      
+      <h1 class="h5"> Shopping cart </h1>
+
+	<hr>
+
+      {% for item in cart %}
+      
+      {% with pdt=item.product %}
+      
+      <br>
+
+      <div class="row mb-4 border product-item">
+        
+        <div class="col-md-3 col-lg-2 order-md-first bg-light">
+        
+            <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image" src="{{ pdt.image.url }}"> <!-- Product image -->
+        
+        </div>
+
+        
+        <div class="col-md-9 col-lg-10 ps-md-3 ps-lg-10">
+          
+          <a href="{{pdt.get_absolute_url}}" class="text-decoration-none"> <!-- Product get absolute url -->
+          
+            <h1 class="h5 pt-2"> {{ pdt.title }}</h1>
+          
+          </a>
+          
+          <div class="border">
+            
+            <div class="col border-bottom">
+              
+                <div class="row p-3">
+              
+                <div class="col-6"> Product </div>
+              
+                <div class="col-6 text-end"><span class="h6 fw-bold">&#8358; {{ pdt.price|mul:item.product_qty }} </span></div>
+            
+              </div>
+            
+            </div>
+            
+            <div class="col">
+              
+              <div class="row p-3">
+                
+                <div class="col-12">
+                  
+                  <label for="select">Qty</label>
+
+                  &nbsp; 
+                  
+                  <select id="select{{pdt.id}}">
+                  
+                    <option selected>
+                  
+                        {{item.product_qty}}
+                  
+                    </option>
+                  
+                    <option value="">1</option>
+                  
+                    <option value="">2</option>
+                  
+                    <option value="">3</option>
+                  
+                    <option value="">4</option>
+                  
+                  </select>
+                  
+                  <br> <br> 
+
+                  <button type="button" data-index="{{pdt.id}}"
+                    class="btn btn-primary btn-sm update-button">
+                    Update
+                  
+                  </button>
+                  
+                  &nbsp;
+
+                  <button type="button" data-index="{{pdt.id}}"
+                    class="btn btn-danger btn-sm delete-button">
+                    Delete
+        
+                  </button>
+        
+
+                </div>
+                
+        
+            </div>
+        
+            </div>
+    
+            </div>
+    
+        </div>
+      
+    </div>
+      
+    {% endwith %}
+
+    {% endfor %}
+
+      <div class="col-12 text-end">
+ 
+        <div class="h6 fw-bold"> Sub total: &#8358; <div id="total" class="d-inline-flex"> {{cart.get_total_price}} </div></div>
+ 
+      </div>
+        <br>
+        <br>
+      <a class="btn btn-primary" href="{%url 'checkout'%}">check out</a>
+        <br>
+        <br>
+ 
+
+    </div>
+  
+
+ </main>
+
+ <script>  
+  //delete button  
+
+  $ (document).on('click', '.delete-button', function(e){
+
+
+      e.preventDefault();
+
+      $.ajax({
+
+          type: 'POST',
+
+          url: '{% url "remove_cart" %}',
+
+          data: {
+
+              product_id: $(this).data('index'),
+
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+
+              action: 'post'
+
+          },
+          success: function(json){
+
+              location.reload()
+              
+              document.getElementById('cart_qty').textContent = json.qty
+
+              document.getElementById('total').textContent = json.cart_total
+          
+          },
+
+          error: function(xhr, errmsg, err){
+
+          }
+
+      });
+  })
+
+  //update button
+
+  $ (document).on('click', '.update-button', function(e){
+
+
+    e.preventDefault();
+
+    var qty_pdt_id = $(this).data('index')
+
+    $.ajax({
+
+        type: 'POST',
+
+        url: '{% url "update_cart" %}',
+
+        data: {
+
+            product_id: $(this).data('index'),
+
+            product_qty: $('#select' + qty_pdt_id + ' option:selected').text(),
+
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+
+            action: 'post'
+
+        },
+        success: function(json){
+
+            location.reload()
+            
+            document.getElementById('cart_qty').textContent = json.qty
+
+            document.getElementById('total').textContent = json.cart_total
+        
+        },
+
+        error: function(xhr, errmsg, err){
+
+        }
+
+    });
+})
+
+
+</script>
+
+
+
+{% endblock %}
+

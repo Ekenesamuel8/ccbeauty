@@ -1,0 +1,25 @@
+
+{% include "ccstore/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<body>
+    <br>
+    <div class="login-card">
+        <div class="login-header"></div>
+        <div class="login-body">
+            <div class="text-center">
+                <h3>payment failed</h3>
+
+                <p> It might be netwoek issue or issuficient balance from your bank account </p>
+                <p> Please try again later </p>
+
+                <a href="{% url 'cart_summary' %}" class="btn btn-primary btn-login w-100 text-white fw-bold">Back to shop</a>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock content %}
