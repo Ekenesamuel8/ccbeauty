@@ -164,6 +164,48 @@ body {
     padding-left: 15px;
 }
 
+/* profile account */
+
+.profile-pic-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-pic-wrapper img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.edit-icon-label {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.edit-icon-label:hover {
+    background-color: #0056b3;
+}
+
+.edit-icon-label input[type="file"] {
+    display: none;
+}
+
+.username-title {
+    margin-top: 1rem;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
 @media (max-width: 478px) {
     .sidebar {
         width: 100%;
