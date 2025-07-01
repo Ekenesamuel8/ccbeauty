@@ -21,8 +21,12 @@ def checkout(request):
     if request.user.is_authenticated:
 
         try:
+            cart = Cart(request)
+            #get the cart items
+            total_items = cart.__len__()
+            total_cost = cart.get_total_price()
             shipping_address = RegisterAddress.objects.get(user=request.user.id)
-            context = {'shipping_address': shipping_address}
+            context = {'shipping_address': shipping_address, 'total_cost': total_cost, 'cart': cart, 'total_items': total_items}
             return render(request, 'payment/checkout.html', context=context)
         except:
             return render(request, 'payment/checkout.html')
@@ -143,9 +147,6 @@ def verify_payment(request, ref):
 def makepament(request):
     cart = Cart(request)
     PAYSTACK_PK = settings.PAYSTACK_PUBLIC_KEY
-
-    #item  = cart.__iter__()
-    #total_items = cart.__len__()
     total_cost = cart.get_total_price()
     email = request.user.email
     

@@ -1,84 +1,69 @@
-
 {% include "ccstore/base.html" %}
-
-
 {% load static %}
-
-
 {% block content %}
 
 <body>
-
-    <div class="login-card">
-        <div class="login-header"></div>
-        <div class="login-body">
-            <form id="form">
-
-                <div>
-
-                    <h3> <i class="fa fa-chevron-circle-right" aria-hidden="true"></i> &nbsp; Complete your order </h3>
-
-                    <p> Please enter in the relevant information below. </p>
- 
-                    <hr>
-                    <br>
-
-                    <div class="form-field">                   
-                        <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off" value="{{shipping_address.fullname}}" required>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center p-2">
+                        <h6>Contact Information</h6>
+                        <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">Change</a>
                     </div>
-
-                    <br>
-
-                    <div class="form-field">
-                        <input class="form-control validate" id="email" type="email" placeholder="Email address*" autocomplete="off" value="{{shipping_address.email}}" required>
+                    <div class="card-body p-2">
+                        <h6 class="p-2">Name: {{ shipping_address.fullname }}</h6>
+                        <p class="mb-1 text-muted">Email: {{ shipping_address.email }}</p>
+                        <p class="p-2 text-muted">Phone: {{ shipping_address.phone }}</p>
                     </div>
-                    
-                    <br>
-                    
-                    <div class="form-field">
-                        <input class="form-control validate" id="address1" type="text" placeholder="Address 1*" autocomplete="off" value="{{shipping_address.address1}}" required>
-                    </div>
-
-                    <br>
-
-                    <div class="form-field">
-                        <input class="form-control validate" id="address2" type="text" placeholder="Address 2*" autocomplete="off" value="{{shipping_address.address2}}" required>
-                    </div>
-
-                    <br>
-
-                    <div class="form-field">
-                        <input class="form-control validate" id="city" type="text" placeholder="City*" autocomplete="off" value="{{shipping_address.city}}" required>
-                    </div>
-
-                    <br>
-
-                    <div class="form-field">
-                        <input class="form-control" id="state" type="text" placeholder="State (Optional)" autocomplete="off" value="{{shipping_address.state}}">
-                    </div>
-
-                    <br>
-
-                    <div class="form-field">
-                        <input class="form-control" id="zipcode" type="text" placeholder="Zip code (Optional)" autocomplete="off" value="{{shipping_address.zipcode}}">
-                    </div>
-            
                 </div>
-
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center p-2">
+                        <h6>Shipping Address:</h6>
+                        <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">Change</a>
+                    </div>
+                    <div class="card-body p-2">
+                        <p class="mb-1 text-muted">{{ shipping_address.address1 }}, {{ shipping_address.address2 }}, {{ shipping_address.city }}, {{ shipping_address.state }} {{ shipping_address.zipcode }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6>Order Summary</h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p>Total items in your cart:</p>
+                        <p class="text-bold">{{ total_items }}</p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-bold">Subtotal:</p>
+                        <p class="text-bold">&#8358;{{ cart.get_total_price }}</p>
+                    </div>
+                </div>
+            </div>                
+            <div class="login-body">
+                <form id="form">
+                    <div>                        
+                        <br>
+                        <div class="form-field">                   
+                            <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off" value="{{shipping_address.fullname}}" required>
+                        </div>
+                        <br>
+                        <div class="form-field">
+                            <input class="form-control validate" id="email" type="email" placeholder="Email address*" autocomplete="off" value="{{shipping_address.email}}" required>
+                        </div>
+                    </div>
+                    <br>
+                <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
                 <br>
-
-               <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
-               
+                </form>
                 <br>
-
-            </form>
-
-            <br>
-
+            </div>            
         </div>
-
     </div>
-
         <br>
 
     </body>
