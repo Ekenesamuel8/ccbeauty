@@ -1,225 +1,144 @@
 {% include "ccstore/base.html" %}
-
-
 {% load static %}
-
 {% load mathfilters %}
-
-
 {% block content %}
 
-
-<main class="pt-5">
-    
-    <div class="container">
-      
-      <h1 class="h5"> Shopping cart </h1>
-
-	<hr>
-
-      {% for item in cart %}
-      
-      {% with pdt=item.product %}
-      
-      <br>
-
-      <div class="row mb-4 border product-item">
-        
-        <div class="col-md-3 col-lg-2 order-md-first bg-light">
-        
-            <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image" src="{{ pdt.image.url }}"> <!-- Product image -->
-        
-        </div>
-
-        
-        <div class="col-md-9 col-lg-10 ps-md-3 ps-lg-10">
-          
-          <a href="{{pdt.get_absolute_url}}" class="text-decoration-none"> <!-- Product get absolute url -->
-          
-            <h1 class="h5 pt-2"> {{ pdt.title }}</h1>
-          
-          </a>
-          
-          <div class="border">
-            
-            <div class="col border-bottom">
+<main>    
+    <div class="container">      
+      <h6 class="fw-bold"> Shopping cart ({{ cart|length }}) </h6>	
+      <div class="row mt-3">
+          <div class="col-lg-8 mb-3">
+            <div class="card p-2">
               
-                <div class="row p-3">
-              
-                <div class="col-6"> Product </div>
-              
-                <div class="col-6 text-end"><span class="h6 fw-bold">&#8358; {{ pdt.price|mul:item.product_qty }} </span></div>
-            
-              </div>
-            
-            </div>
-            
-            <div class="col">
-              
-              <div class="row p-3">
-                
-                <div class="col-12">
-                  
-                  <label for="select">Qty</label>
+              {% for item in cart %}              
+              {% with pdt=item.product %}      
+              <div class="card-body p-0">
+                <div class="d-flex justify-content-between align-items-start mb-1">        
+                  <div class="col-md-4 col-lg-3 col-xl-3"> <!-- Product image and details -->  
+                    <img class="img-fluid" style="width: 200px; height: auto;" alt="Responsive image" src="{{ pdt.image.url }}"> <!-- Product image -->
+                  </div>
 
-                  &nbsp; 
-                  
-                  <select id="select{{pdt.id}}">
-                  
-                    <option selected>
-                  
-                        {{item.product_qty}}
-                  
-                    </option>
-                  
-                    <option value="">1</option>
-                  
-                    <option value="">2</option>
-                  
-                    <option value="">3</option>
-                  
-                    <option value="">4</option>
-                  
-                  </select>
-                  
-                  <br> <br> 
-
-                  <button type="button" data-index="{{pdt.id}}"
-                    class="btn btn-primary btn-sm update-button">
-                    Update
-                  
-                  </button>
-                  
-                  &nbsp;
-
-                  <button type="button" data-index="{{pdt.id}}"
-                    class="btn btn-danger btn-sm delete-button">
-                    Delete
-        
-                  </button>
-        
-
+                  <div class="col-8"> <!-- Product details -->            
+                    <a href="{{pdt.get_absolute_url}}"class=" mb-1 text-decoration-none">{{ pdt.title }} </a>              
+                    <div class="text-end"><span class="fw-bold text-dark">&#8358; {{ pdt.price|mul:item.product_qty }} </span></div>
+                  </div>            
                 </div>
-                
-        
+                <div class="col">            
+                  <div class="row p-1">                
+                    <div class="col-12">                  
+                      <label for="select">Qty</label>
+                      <select id="select{{pdt.id}}">                  
+                        <option selected>                  
+                            {{item.product_qty}}
+                        </option>
+                        <option value="">1</option>                      
+                        <option value="">2</option>                      
+                        <option value="">3</option>                      
+                        <option value="">4</option>
+                        <option value="">5</option>
+                        <option value="">6</option>                      
+                      </select>
+                      
+                      &nbsp;
+
+                      <button type="button" data-index="{{pdt.id}}"
+                        class="btn btn-primary btn-sm btn-md-md update-button d-inline-flex align-items-center">
+                        
+                        <span class="d-md-inline">Update</span>  
+                      </button>
+                      
+                      &nbsp;
+                      
+                      <button type="button" data-index="{{pdt.id}}"
+                        class="btn btn-danger btn-sm btn-md-md delete-button d-inline-flex align-items-center">
+                        <i class="fa fa-trash-o m-0" aria-hidden="true"></i> 
+                        <span class="d-none d-md-inline">Remove</span>            
+                      </button>
+                    </div>                        
+                  </div>
+                </div>        
+              </div> 
+              <hr>           
+              {% endwith %}
+
+              {% endfor %}
             </div>
-        
+          </div>
+
+          <div class="col-md-4">  
+            <div class="card mt-3">
+              <div class="card-header">
+                <strong>cart summary</strong>
+              </div>
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>Subtotal</div>
+                  <div id="total" class="d-inline-flex fw-bold"> 
+                    &#8358; {{cart.get_total_price}} 
+                  </div>
+                </div>                
+              </div>
+              <div class="card-footer text-center">
+                <a class="btn btn-primary" href="{%url 'checkout'%}">check out</a>
+              </div>
             </div>
-    
-            </div>
-    
-        </div>
-      
+          </div>
     </div>
-      
-    {% endwith %}
-
-    {% endfor %}
-
-      <div class="col-12 text-end">
- 
-        <div class="h6 fw-bold"> Sub total: &#8358; <div id="total" class="d-inline-flex"> {{cart.get_total_price}} </div></div>
- 
-      </div>
-        <br>
-        <br>
-      <a class="btn btn-primary" href="{%url 'checkout'%}">check out</a>
-        <br>
-        <br>
- 
-
-    </div>
-  
-
- </main>
+  </div>  
+</main>
 
  <script>  
   //delete button  
-
   $ (document).on('click', '.delete-button', function(e){
-
 
       e.preventDefault();
 
       $.ajax({
 
           type: 'POST',
-
           url: '{% url "remove_cart" %}',
 
           data: {
-
               product_id: $(this).data('index'),
-
               csrfmiddlewaretoken: '{{ csrf_token }}',
-
               action: 'post'
-
           },
           success: function(json){
-
-              location.reload()
-              
+              location.reload()              
               document.getElementById('cart_qty').textContent = json.qty
-
-              document.getElementById('total').textContent = json.cart_total
-          
+              document.getElementById('total').textContent = json.cart_total          
           },
-
           error: function(xhr, errmsg, err){
 
           }
-
       });
   })
 
   //update button
-
   $ (document).on('click', '.update-button', function(e){
 
-
     e.preventDefault();
-
     var qty_pdt_id = $(this).data('index')
 
     $.ajax({
-
         type: 'POST',
-
         url: '{% url "update_cart" %}',
-
         data: {
-
             product_id: $(this).data('index'),
-
             product_qty: $('#select' + qty_pdt_id + ' option:selected').text(),
-
             csrfmiddlewaretoken: '{{ csrf_token }}',
-
             action: 'post'
-
         },
         success: function(json){
-
             location.reload()
-            
             document.getElementById('cart_qty').textContent = json.qty
-
             document.getElementById('total').textContent = json.cart_total
-        
         },
-
         error: function(xhr, errmsg, err){
 
         }
-
     });
 })
 
-
 </script>
-
-
-
 {% endblock %}
-

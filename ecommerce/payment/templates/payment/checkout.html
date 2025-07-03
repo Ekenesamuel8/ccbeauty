@@ -3,24 +3,30 @@
 {% block content %}
 
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-md-8">
                 <div class="card mt-3">
                     <div class="card-header d-flex justify-content-between align-items-center p-2">
-                        <h6>Contact Information</h6>
-                        <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">Change</a>
+                        <div>
+                            <span class="text-success me-1">&#10003;</span> <!-- Green check mark -->
+                            <strong>customer info</strong>
+                        </div> 
+                       <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">change</a>
                     </div>
                     <div class="card-body p-2">
-                        <h6 class="p-2">Name: {{ shipping_address.fullname }}</h6>
-                        <p class="mb-1 text-muted">Email: {{ shipping_address.email }}</p>
-                        <p class="p-2 text-muted">Phone: {{ shipping_address.phone }}</p>
+                        <p>Name: {{ shipping_address.fullname }}</p>
+                        <p class="text-muted">Email: {{ shipping_address.email }}</p>
+                        <p class="text-muted">Phone: {{ shipping_address.phone }}</p>
                     </div>
                 </div>
                 <div class="card mt-3">
                     <div class="card-header d-flex justify-content-between align-items-center p-2">
-                        <h6>Shipping Address:</h6>
-                        <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">Change</a>
+                        <div>
+                            <span class="text-success me-1">&#10003;</span> <!-- Green check mark -->
+                            <strong>shipping address</strong>
+                        </div>
+                        <a href="{% url 'manage_shipping_address' %}" class="text-primary text-decoration-none">change</a>
                     </div>
                     <div class="card-body p-2">
                         <p class="mb-1 text-muted">{{ shipping_address.address1 }}, {{ shipping_address.address2 }}, {{ shipping_address.city }}, {{ shipping_address.state }} {{ shipping_address.zipcode }}</p>
@@ -29,42 +35,33 @@
             </div>
             <div class="col-md-4">
                 
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6>Order Summary</h6>
-                </div>
-                <div class="card-body p-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p>Total items in your cart:</p>
-                        <p class="text-bold">{{ total_items }}</p>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <span class="text-success me-1">&#10003;</span> <!-- Green check mark -->
+                        <strong>order summary</strong>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="text-bold">Subtotal:</p>
-                        <p class="text-bold">&#8358;{{ cart.get_total_price }}</p>
-                    </div>
-                </div>
-            </div>                
-            <div class="login-body">
-                <form id="form">
-                    <div>                        
-                        <br>
-                        <div class="form-field">                   
-                            <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off" value="{{shipping_address.fullname}}" required>
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p>Total items in your cart:</p>
+                            <p class="text-bold">{{ total_items }}</p>
                         </div>
-                        <br>
-                        <div class="form-field">
-                            <input class="form-control validate" id="email" type="email" placeholder="Email address*" autocomplete="off" value="{{shipping_address.email}}" required>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="text-bold">Subtotal:</p>
+                            <p><strong>&#8358;{{ cart.get_total_price }}</strong></p>
                         </div>
                     </div>
-                    <br>
-                <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
-                <br>
-                </form>
-                <br>
-            </div>            
+                    <div class="card-footer text-center">
+                        <form id="form">
+                            
+                        <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
+
+                        </form>
+                    </div>  
+                </div>              
+
+            </div>         
         </div>
     </div>
-        <br>
 
     </body>
     
@@ -84,13 +81,13 @@
     
                 data: {
     
-                    fullname: $('#name').val(),
-                    email: $('#email').val(),
-                    address1: $('#address1').val(),
-                    address2: $('#address2').val(),
-                    city: $('#city').val(),
-                    state: $('#state').val(),
-                    zipcode: $('#Zipcode').val(),
+                    fullname: "{{ shipping_address.fullname }}",
+                    email: "{{ shipping_address.email }}",
+                    address1: "{{ shipping_address.address1 }}",
+                    address2: "{{ shipping_address.address2 }}",
+                    city: "{{ shipping_address.city }}",
+                    state: "{{ shipping_address.state }}",
+                    zipcode: "{{ shipping_address.zipcode }}",
 
                     csrfmiddlewaretoken: '{{ csrf_token }}',
     
