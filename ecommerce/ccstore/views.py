@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from . models import Category, Product
+from django.db.models import Q
 
 # Create your views here.
 def store(request):
@@ -20,3 +21,16 @@ def pdt_category(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug) #get category by slug
     products = Product.objects.filter(Category=category) #get all products in this category
     return render(request, 'ccstore/pdt_category.html', {'category':category, 'products':products}) #render the category.html template
+
+def search(request):
+    query = request.GET.get('q', '') #get the search query from the URL
+    if query:
+        products = Product.objects.filter(Q(title__icontains=query) | Q(description__icontains=query) | Q(Category__name__icontains=query)) #filter products by title or description containing the query
+    else:
+        products = Product.objects.none() #if no query, get no products
+
+    context = {
+        'query' : query,
+        'products' : products,
+    }
+    return render(request, 'ccstore/search_results.html', context) #render the search.html template with products and query
