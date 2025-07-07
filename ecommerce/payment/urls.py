@@ -8,7 +8,7 @@ urlpatterns = [
 
     path('checkout/', views.checkout, name='checkout'),
 
-    path('makepayment/', views.makepament, name='makepayment'),
+    path('makepayment/', views.makepayment, name='makepayment'),
 
     path('verify_payment<str:ref>/', views.verify_payment, name='verify_payment'),
 

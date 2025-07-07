@@ -17,7 +17,7 @@ from payment.models import RegisterAddress
 from django.contrib.auth.decorators import login_required
 
 from django.contrib import messages
-from payment.models import Order, RegisterAddress
+from payment.models import Order, RegisterAddress, OrderItem
 
 from .models import UserProfile
 
@@ -257,3 +257,18 @@ def manage_shipping_address(request):
     #passing the form to the context dictionary
 
     return render(request, 'account/manage_shipping_address.html', context=context)
+
+
+@login_required(login_url='login')
+def order_history(request):
+    orders = Order.objects.filter(user=request.user)
+    order_items = OrderItem.objects.filter(user=request.user)
+    #getting all the orders of the user
+
+    context = {
+        'orders': orders,
+        'order_items': order_items
+    }
+
+    return render(request, 'account/order_history.html', context=context)
+

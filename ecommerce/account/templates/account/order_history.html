@@ -1,0 +1,41 @@
+{% include "ccstore/base.html" %}
+
+
+{% load static %}    
+
+
+{% block content %}
+    <h1>Order History</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for order_item in order_items %}
+                <tr>
+                    <td>{{ order_item.id }}</td>
+                    <td>{{ order_item.date_ordered }}</td>
+                    <td>{{ order_item.price }}</td>
+                    <td>
+                        {{ order_item.product }}
+                    </td>
+                    <td>
+                        {{ order_item.quantity }}
+                    </td>
+                    <td>
+                        {{ order_item.price }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

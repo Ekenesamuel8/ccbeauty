@@ -36,9 +36,9 @@ urlpatterns = [
 
     #password reset sent urls
     path('password_reset_sent/', auth_views.PasswordResetDoneView.as_view(template_name='account/password/password_reset_sent.html'), name='password_reset_done'),
-
-    
-    
+   
     path('manage_shipping_address/', views.manage_shipping_address, name='manage_shipping_address'),
+
+    path('order_history/', views.order_history, name='order_history'),
 
 ]

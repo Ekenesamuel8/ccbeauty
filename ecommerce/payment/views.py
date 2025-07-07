@@ -7,15 +7,17 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 
-
+@login_required(login_url='login')
 def payment_failed(request):    
     return render(request, 'payment/payment_failed.html')
 
 
+@login_required(login_url='login')
 def payment_success(request):
 
     return render(request, 'payment/payment_success.html')
 
+@login_required(login_url='login')
 def checkout(request):
 
     if request.user.is_authenticated:
@@ -33,7 +35,8 @@ def checkout(request):
     else:
 
         return render(request, 'payment/checkout.html')
-    
+
+@login_required(login_url='login')    
 def orders(request):
 
     if request.POST.get('action') == 'post':
@@ -103,7 +106,7 @@ def orders(request):
 
         return response
     
-
+@login_required(login_url='login')
 def verify_payment(request, ref):
     try:
         payment = Payment.objects.get(ref=ref)
@@ -144,7 +147,8 @@ def verify_payment(request, ref):
         messages.warning(request, 'Sorry, payment not found for this ref')
         return JsonResponse({'error message': 'Sorry, payment not found'})
 
-def makepament(request):
+@login_required(login_url='login')
+def makepayment(request):
     cart = Cart(request)
     PAYSTACK_PK = settings.PAYSTACK_PUBLIC_KEY
     total_cost = cart.get_total_price()
