@@ -4,7 +4,7 @@
 }
 body {
     background-color: warmwhite;
-    padding-top: 70px;
+    padding-top: 50px;
     font-family: 'Inter', 'Arial', sans-serif; /* Professional font */
 }
 /* navbar */
@@ -184,7 +184,7 @@ body {
 /* Login and register Page Styles */
 .login-card {
     max-width: 600px;
-    margin: 15px auto;
+    margin: 30px auto;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -306,6 +306,12 @@ body {
     
 }
 
+.product-info-image {
+    width: 100%;
+    height: 420px; /* Set your desired fixed height */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+}
+
 /* profile account */
 
 .profile-pic-wrapper {
@@ -362,7 +368,11 @@ body {
     }
 
 @media (max-width: 400px) {
-    
+
+    .login-card {
+        width: 100%; /* Full width for mobile */
+        margin: 0 auto; /* Center the card */
+    }
     .sidebar {
         width: 100%;
         margin-top: 20px;
@@ -413,7 +423,7 @@ body {
     }
     .product-title {
         font-size: 0.85rem;
-}
+    }
 
 /* product-info.css */
   .pdt-title {
@@ -431,5 +441,9 @@ body {
         padding-left: 0;
         margin: 0;
     }
+
+    .product-info-image {
+    
+    height: 350px; /* Set your desired fixed height */}
     
 }

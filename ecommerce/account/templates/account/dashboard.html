@@ -33,7 +33,15 @@
                         <div class="section-content">
                             <div class="align-items-center">
                                 <!-- Display Profile Image if Available -->
-                                <img src="{{ profile_picture.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% if profile_picture.profile_picture %}
+                                <img src="{{ profile_picture.profile_picture.url }}" alt="Profile Picture"
+                                    class="img-fluid rounded-circle"
+                                    style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/default-profile.jpg' %}" alt="Default Profile"
+                                    class="img-fluid rounded-circle"
+                                    style="width: 150px; height: 150px; object-fit: cover;">
+                            {% endif %}
 
                                 <div>
                                     <br>

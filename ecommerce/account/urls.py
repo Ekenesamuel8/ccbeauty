@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .form import CustomPasswordResetForm
 
 urlpatterns = [
 
@@ -14,7 +15,7 @@ urlpatterns = [
 
     path('email_verification_failed/', views.email_verification_failed, name='email_verification_failed'), #email verification failed page
 
-    path('login/', views.login, name='login'),
+    path('login/', views.login_view, name='login'),
 
     path('logout/', views.logout, name='logout'),
 
@@ -26,7 +27,7 @@ urlpatterns = [
 
 
     #password reset urls
-    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='account/password/password_reset.html'), name='password_reset'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='account/password/password_reset.html', form_class=CustomPasswordResetForm), name='password_reset'),
 
     #password reset done urls   
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='account/password/password_reset_done.html'), name='password_reset_complete'),
@@ -42,3 +43,5 @@ urlpatterns = [
     path('order_history/', views.order_history, name='order_history'),
 
 ]
+
+handler403 = 'account.views.rate_limit_exceeded'

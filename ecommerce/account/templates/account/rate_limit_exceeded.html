@@ -1,0 +1,12 @@
+{% include "ccstore/base.html" %}
+
+{% load static %}
+{% block content %}
+  <h2>Too Many Requests</h2>
+  <p>You've exceeded the request limit. Please try again in a minute.</p>
+  {% if messages %}
+    {% for message in messages %}
+      <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endblock %}

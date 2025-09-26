@@ -45,7 +45,14 @@
                     {{ form.password2 | as_crispy_field }}
                 </div>
 
-               <button type="submit" class="btn btn-primary btn-login w-100 text-white fw-bold"> Register </button>
+                <div class="mb-3">
+                    {{ form.captcha | as_crispy_field }}
+                </div>
+                <script src="https://www.google.com/recaptcha/api.js"></script>
+
+                <button type="submit" class="btn btn-primary btn-login w-100 text-white fw-bold"> Register </button>
+
+            </form>
 
                 <div class="text-center my-3 extra-links">
                     <a href="{% url 'login' %}"> Already have an account? Login here </a>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from . models import Category, Product
+from . models import Category, Product, ProductImage
 from django.db.models import Q
 
 # Create your views here.
@@ -14,7 +14,8 @@ def category(request):
 
 def product_info(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug) #get product by slug
-    context = {'pdt' : product} #create a dictionary with product
+    images = product.images.all()  # Get all extra images linked to this product
+    context = {'pdt' : product, 'images': images} #create a dictionary with product
     return render(request, 'ccstore/product_info.html', context) #render the product_info.html template
 
 def pdt_category(request, category_slug):

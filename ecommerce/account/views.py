@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, auth
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 
 from django.contrib.sites.shortcuts import get_current_site
+from urllib3 import request
 
 from .token import user_tokenizer_generate
 
@@ -20,7 +21,8 @@ from django.contrib import messages
 from payment.models import Order, RegisterAddress, OrderItem
 
 from .models import UserProfile
-
+from django_ratelimit.decorators import ratelimit
+from axes.decorators import axes_dispatch
 
 def register(request):
 
@@ -103,43 +105,49 @@ def email_verification_failed(request):
     
     return render(request, 'account/registration/email_verification_failed.html')
 
-def login(request):
+@ratelimit(key='post:username', rate='6/m', method='POST', block=True, group='login')  # 6 attempts per minute per username
+@axes_dispatch
+def login_view(request):
 
     form = LoginForm()
 
     if request.method == 'POST':
+        print("POST request received, rate limit status:", getattr(request, 'limited', False))  # Debug
         form = LoginForm(request, data=request.POST)
         #creating an instance of the LoginForm class with the data from the form
 
         if form.is_valid():
 
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            #getting the username and password from the form
-
-            user = authenticate(username=username, password=password)
-            #authenticating the user
+            user = form.get_user()
+            #getting the user from the form
 
             if user is not None:
 
-                auth.login(request, user)
+                login(request, user)
                 #logging in the user
 
                 messages.success(request, 'You are now logged in')
 
-                return redirect('dashboard')
-            
-            
+                return redirect('store')
+        else:
+            print(form.errors)  # Debug: Print errors to console
+            messages.error(request, 'Invalid username/email or password.')  # Show error to user
+    else:
+        form = LoginForm(request=request)  # Initialize with request for GET            
     context = {'form': form}
     #passing the form to the context dictionary
 
     return render(request, 'account/login.html', context=context)
 
 
+def rate_limit_exceeded(request, exception):
+    messages.error(request, 'Too many login attempts. Please try again in a minute.')
+    return render(request, 'account/rate_limit_exceeded.html')
+
+
 def logout(request):
 
-    try:
-        
+    try:    
 
         for key in list(request.session.keys()):
             #iterating over the session keys
@@ -160,12 +168,16 @@ def logout(request):
 
 @login_required(login_url='login')
 def dashboard(request):
-    user_details = get_object_or_404(RegisterAddress, user=request.user.id)
+    user_details = RegisterAddress.objects.filter(user=request.user).first()
     #getting the user details using the user id
 
-    address = user_details.address1 + ' ' + user_details.address2 + ' ' + user_details.city + ' ' + user_details.state + ' ' + user_details.zipcode
+    if user_details:
+        address = user_details.address1 + ' ' + user_details.address2 + ' ' + user_details.city + ' ' + user_details.state + ' ' + user_details.zipcode
+    else:
+        address = None
+        #if the user has not input his address, set the address to None
 
-    profile_picture = UserProfile.objects.get(user=request.user.id)
+    profile_picture, created = UserProfile.objects.get_or_create(user=request.user)
 
     context = {
         'user_details' : user_details,

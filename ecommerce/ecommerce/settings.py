@@ -13,14 +13,14 @@ load_dotenv()
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    'localhost',           # For local testing
-    '127.0.0.1',          # For local testing
-    'your-domain.com',    # Replace with your actual domain (if applicable)
-    'your-s3-bucket-url', # Replace with your AWS S3 custom domain (e.g., ccbeatystatic.s3.af-south-1.amazonaws.com)
-
+    #'localhost',           # For local testing
+    #'127.0.0.1',          # For local testing
+    #'your-domain.com',    # Replace with your actual domain (if applicable)
+    #'your-s3-bucket-url', # Replace with your AWS S3 custom domain (e.g., ccbeatystatic.s3.af-south-1.amazonaws.com)
+    '*',                   # Allow all hosts (for development only, restrict in production)
 ]
 
 # Application definition
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'corsheaders',
     'storages',
+    'django_recaptcha',
+    'axes',  # Add Axes for rate limiting
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'axes.middleware.AxesMiddleware',  # Add Axes middleware for rate limiting
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
@@ -76,6 +79,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
+"""
 # Database
 DATABASES = {
     'default': {
@@ -84,18 +88,18 @@ DATABASES = {
     }
 }
 # RDS Configuration FROM AWS
-""""
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'NAME': config('NAME'),
+        'USER': config('USER'),
+        'PASSWORD': config('PASSWORD'),
+        'HOST': config('HOST'),
+        'PORT': config('PORT'),
     }
 }
-"""
+
 CORS_ALLOWED_ORIGINS = [
     'https://paystack.com',
     'https://checkout.paystack.com',
@@ -134,8 +138,8 @@ if DEBUG:
     MEDIA_ROOT = BASE_DIR / 'static/media'
 else:
     # AWS S3 settings
-    AWS_STORAGE_BUCKET_NAME = 'ccbeatystatic'
-    AWS_S3_REGION_NAME = 'af-south-1'
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
@@ -180,4 +184,61 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Recaptcha settings
+RECAPTCHA_ENABLED = True
+RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
+
+"""
+# Session and cookie security settings
+SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
+CSRF_COOKIE_SECURE = True  # Only send CSRF cookies over HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookies
+SESSION_COOKIE_SAMESITE = 'Lax'  # Protect against CSRF in cross-site requests
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expire session on browser close
+SESSION_COOKIE_AGE = 1209600  # 2 weeks for persistent sessions
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+"""
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Cache for django-ratelimit, this is for local development
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+''' Redis cache configuration for django-ratelimit 
+switch to this for django-ratelimit caching for production use
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}'''
+
+AXES_HANDLER = 'axes.handlers.database.AxesDatabaseHandler'
+
+AXES_LOCKOUT_TEMPLATE = 'account/lockout.html'
+
+AXES_ENABLED = True #help me debug
+AXES_LOCK_OUT_BY_USER = True
+AXES_LOCK_OUT_BY_IP = False
+AXES_ONLY_USER_FAILURES = True  # ✅ Only track failures by user, not IP or user agent and this help too
+AXES_FAILURE_LIMIT = 5
+AXES_RESET_ON_SUCCESS = True
 

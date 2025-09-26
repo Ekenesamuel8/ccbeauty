@@ -1,13 +1,10 @@
 {% include "ccstore/base.html" %}
 
-
 {% load static %}
 
 {% load crispy_forms_tags %}    
 
-
 {% block content %}
-
 
 <body>
 
@@ -15,15 +12,12 @@
         <div class="login-header"></div>
         <div class="login-body">
 
-        
-
             <h4 class="login-title">Login Your Account</h4>
 
             <form method="POST" autocomplete="off">
 
                 {% csrf_token %}
 
-                
                 <div class="mb-3">
                     {{ form.username | as_crispy_field }}
                 </div>
@@ -39,8 +33,6 @@
                <button type="submit" class="btn btn-primary btn-login w-100 text-white fw-bold"> Login </button>
 
                <br>
-               <br>
-
                <div class="text-center my-3 extra-links">
                 <a href="{% url 'password_reset' %}"> Forgot password? </a>
                 <span class="mx-2">|</span>
@@ -48,14 +40,9 @@
 
                </div>
             </form>
-
-
     </div>
     </div>
-    
+
 </body>
-
-
-
 
 {% endblock %}

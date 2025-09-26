@@ -1,0 +1,9 @@
+{% include "ccstore/base.html" %}
+
+{% load static %}
+
+{% block content %}
+  <h2>Account Locked</h2>
+  <p>You've exceeded the login attempt limit. Please try again in 20 minutes or contact support.</p>
+  <a href="{% url 'password_reset' %}">Reset Password</a>
+{% endblock %}
