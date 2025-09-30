@@ -5,7 +5,7 @@
 
 <main> 
     <div class="container">      
-      <h6 class="fw-bold"> Shopping cart ({{ cart|length }}) </h6>	
+      <h6 class="fw-bold pt-3"> Shopping cart ({{ cart|length }}) </h6>	
       <div class="row mt-3">
           <div class="col-lg-8 mb-3">
             <div class="card p-2">
@@ -19,7 +19,7 @@
                   </div>
 
                   <div class="col-8"> <!-- Product details -->            
-                    <a href="{{pdt.get_absolute_url}}"class=" mb-1 text-decoration-none">{{ pdt.title }} </a>              
+                    <a href="{{pdt.get_absolute_url}}"class="text-dark fw-bold p-2 mb-1 text-decoration-none">{{ pdt.title }} </a>              
                     <div class="text-end"><span class="fw-bold text-dark">&#8358; {{ pdt.price|mul:item.product_qty }} </span></div>
                   </div>            
                 </div>

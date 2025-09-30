@@ -81,7 +81,15 @@ def email_verification(request, uidb64, token):
         #activating the user
         user.save()
         #saving the user
-        return redirect("email_verification_success")
+
+        # Log the user in automatically after verifying
+        login(request, user)
+
+        messages.success(request, 'Your email has been verified. please complete your profile.')
+
+        # Redirect to profile completion page
+        return redirect("manage_shipping_address")
+        #return redirect("email_verification_success")
         #redirecting to the email_verification_success page
 
     else:
@@ -262,7 +270,7 @@ def manage_shipping_address(request):
             user_address.save()
             #saving the address
 
-            return redirect('dashboard')
+            return redirect('store')
 
 
     context = {'form': form}

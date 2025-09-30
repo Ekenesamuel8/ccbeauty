@@ -23,6 +23,8 @@ ALLOWED_HOSTS = [
     '*',                   # Allow all hosts (for development only, restrict in production)
 ]
 
+# CSRF_TRUSTED_ORIGINS = [
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -195,17 +197,13 @@ RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
 SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
 CSRF_COOKIE_SECURE = True  # Only send CSRF cookies over HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
-CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookies
 SESSION_COOKIE_SAMESITE = 'Lax'  # Protect against CSRF in cross-site requests
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expire session on browser close
 SESSION_COOKIE_AGE = 1209600  # 2 weeks for persistent sessions
-SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
-SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
 """
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 300  # 5 minutes for persistent sessions
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
