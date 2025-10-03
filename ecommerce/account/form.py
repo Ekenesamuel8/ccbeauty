@@ -36,8 +36,6 @@ class RegisterForm(UserCreationForm):#RegisterForm class inherits from UserCreat
     
     def clean_username(self):
         username = self.cleaned_data.get('username').lower()
-        if not re.match(r'^[a-z0-9_]+$', username):
-            raise forms.ValidationError("Username can only contain lowercase letters, numbers, and underscores.")
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("Username already exists")
             #if username already exists in the database
