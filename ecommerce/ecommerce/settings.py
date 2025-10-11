@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'corsheaders',
     'storages',
-    'django_recaptcha',
+    #'django_recaptcha',
     'axes',  # Add Axes for rate limiting
 ]
 
@@ -186,9 +186,9 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Recaptcha settings
-RECAPTCHA_ENABLED = False
-RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
-RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
+#RECAPTCHA_ENABLED = False
+#RECAPTCHA_PUBLIC_KEY = config('RECAPTCHA_PUBLIC_KEY')
+#RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
 
 """
 # Session and cookie security settings
