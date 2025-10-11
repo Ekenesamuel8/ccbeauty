@@ -45,11 +45,12 @@
                     {{ form.password2 | as_crispy_field }}
                 </div>
 
-                <!-- Recaptcha field
+                {% comment %}
                 <div class="mb-3">
                     {{ form.captcha | as_crispy_field }}
                 </div>
-                <script src="https://www.google.com/recaptcha/api.js"></script> -->
+                <script src="https://www.google.com/recaptcha/api.js"></script>
+                {% endcomment %}
 
                 <button type="submit" class="btn btn-primary btn-login w-100 text-white fw-bold"> Register </button>
 

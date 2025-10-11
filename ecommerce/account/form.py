@@ -8,11 +8,11 @@ from django.forms.widgets import PasswordInput, TextInput#PasswordInput and Text
 from .models import UserProfile#UserProfile model
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth import authenticate#django built_in authenticate function
-from django_recaptcha.fields import ReCaptchaField
+#from django_recaptcha.fields import ReCaptchaField
 
 class RegisterForm(UserCreationForm):#RegisterForm class inherits from UserCreationForm
 
-    captcha = ReCaptchaField()
+    # captcha = ReCaptchaField()
 
     class Meta:
         model = User
