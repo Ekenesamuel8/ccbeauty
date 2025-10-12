@@ -196,12 +196,11 @@ SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
 CSRF_COOKIE_SECURE = True  # Only send CSRF cookies over HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
 SESSION_COOKIE_SAMESITE = 'Lax'  # Protect against CSRF in cross-site requests
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expire session on browser close
-SESSION_COOKIE_AGE = 1209600  # 2 weeks for persistent sessions
 """
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 300  # 5 minutes for persistent sessions
+SESSION_COOKIE_AGE = 600 # Session expires after 10 minutes (600 seconds) of inactivity
+SESSION_SAVE_EVERY_REQUEST = True
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
