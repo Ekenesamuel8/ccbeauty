@@ -37,14 +37,18 @@ class Cart():
 
         products = Product.objects.filter(id__in=all_pdt_id)#get all product objects from db
 
-        cart = self.cart.copy()#copy cart
+        import copy
+
+        cart = copy.deepcopy(self.cart)
+
+        #cart = self.cart.copy()#copy cart
 
         for product in products:#iterate over products
             cart[str(product.id)]['product'] = product #add product object to cart
 
         for item in cart.values():#iterate over cart values
             item['price'] = Decimal(item['price'])#convert price to decimal
-            item['total_price'] = item['price'] * item['product_qty']#calculate total price
+            item['total_price'] = Decimal(item['price'] * item['product_qty'])#calculate total price
             yield item
 
 

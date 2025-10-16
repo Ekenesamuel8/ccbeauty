@@ -11,7 +11,7 @@ load_dotenv()
 
 SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     #'localhost',           # For local testing
