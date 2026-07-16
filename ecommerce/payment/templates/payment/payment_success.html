@@ -1,37 +1,27 @@
 {% include "ccstore/base.html" %}
-
-
 {% load static %}
-
-
 {% block content %}
-
-
 <body>
   <div class="login-card">
-      <div class="login-header"></div>
-      <div class="login-body">
-        <div class="text-center">
-          <i class="fa fa-check fa-3x text-success" aria-hidden="true"></i>
-          <h1 class="display-7 text-black">Payment Successful</h1>
-          <p class="lead mb-5">Your order was successfully received, we'll begin processing ASAP. Here's your ref NO: <br>{{payment.ref}}</p>
-          <a href="{% url 'store' %}" class="btn btn-primary btn-login w-100 text-white fw-bold">Back to shop</a>
-        </div>
+    <div class="login-header"></div>
+    <div class="login-body">
+      <div class="text-center">
+        <i class="fa fa-check fa-3x text-success" aria-hidden="true"></i>
+        <h1 class="display-7 text-black">Payment verified</h1>
+        {% if order.status == 'paid_stock_issue' %}<div class="alert alert-warning">Your payment is verified, but stock changed before confirmation. Staff will contact you about restocking, an approved substitute, or a manual refund.</div>{% endif %}
+        <p>Your payment for order #{{ order.id }} was verified successfully.</p>
+        <p>Reference: {{ payment.ref }}</p>
+        <p>Total paid: &#8358;{{ order.amount_paid }}</p>
       </div>
-    <div class="login-card">
-      <div class="login-body">
-            <div class="container bg-white shadow-md p-5" style="width:500px; border-radius:20px;">
-                <h4>Order Summary</h4>
-                <p>Order ID: {{ payment.ref }}</p>
-                <p>Total Amount: {{ payment.amount_paid }}</p>
-                <p>Email: {{ payment.email }}</p>
-                <p>Items: {{ item }}</p>
-                <p>Shipping Address: {{ shipping_address }}</p>
-                <p>Payment Status: {{ payment.verified }}</p>
-                <p>date : {{ payment.date_paid }}</p>
-            </div>
+      <div class="container bg-white shadow-md p-3">
+        <h4>Order items</h4>
+        {% for item in order.orderitem_set.all %}
+          <p>{{ item.product_title }} &times; {{ item.quantity }} — &#8358;{{ item.line_total }}</p>
+        {% endfor %}
+        <p>Shipping address:<br>{{ order.address1|linebreaksbr }}</p>
       </div>
+      <a href="{% url 'store' %}" class="btn btn-primary btn-login w-100 text-white fw-bold">Back to shop</a>
     </div>
+  </div>
 </body>
-
 {% endblock content %}

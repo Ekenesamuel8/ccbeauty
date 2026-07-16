@@ -1,39 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>search</title>
-    <link rel="stylesheet" href="https://bootswatch.com/5/united/bootstrap.min.css">
-    <!--this is for the theme-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <!-- JavaScript -->
-	<!-- JavaScript Popper -->
-	<!-- Bootstrap Max CDN --> 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-</head>
-
-<body class="container my-2">
-    <div class="search-bar d-flex flex-grow-1 justify-content-center mx-3 d-lg-flex">
-        <form class="d-flex w-100" method="GET" action="">
-        <input class="form-control " type="text" name="q" placeholder="{{ query }}" value="{{ query }}">
-        <button class="btn" type="submit">
-            <i class="fa fa-search btn btn-primary" aria-hidden="true"></i>
-        </button>
-        </form>
-    </div>
-    {% if products %}
-        <ul class="list-unstyled p-1">
-        {% for product in products %}
-            <li class="mb-2">
-                <a class="text-decoration-none" href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No products found for "{{ query }}".</p>
-    {% endif %}
-    <a href="{% url 'store' %}">Back to Home</a>
-</body>
-</html>
+{% extends "ccstore/base.html" %}
+{% block content %}
+<div class="container my-3">
+  <form class="d-flex" method="get" action="{% url 'search' %}">
+    <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Search products">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </form>
+  {% if products %}
+    <ul class="list-unstyled mt-3">{% for product in products %}<li class="mb-2"><a href="{{ product.get_absolute_url }}">{{ product.title }}</a>{% if not product.is_available %} <span class="badge bg-secondary">Out of stock</span>{% endif %}</li>{% endfor %}</ul>
+  {% elif query %}<p class="mt-3">No products found for “{{ query }}”.</p>
+  {% else %}<p class="mt-3">Enter a search term.</p>{% endif %}
+  {% include "ccstore/pagination.html" with page_obj=products %}
+</div>
+{% endblock %}

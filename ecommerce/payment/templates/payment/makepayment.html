@@ -26,6 +26,9 @@
 
                     <br>
                     <button onclick="payWithPaystack()" class="btn btn-primary">Pay with Paystack</button>             
+                    <form id="verification-form" method="post" action="{% url 'verify_payment' payment.ref %}" hidden>
+                        {% csrf_token %}
+                    </form>
                 </div>
             </div>
         </div>
@@ -46,16 +49,11 @@
                 ref: "{{ payment.ref }}", // Replace with your unique reference
 
                 onClose: function() {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Payment Cancelled',
-                        text: 'You closed the payment window.',
-                    });
+                    window.location.href = "{% url 'payment_pending' payment.ref %}";
                 },
 
                 callback: function(response) {
-                    console.log(response);
-                    window.location.href = "{% url 'verify_payment' payment.ref %}";
+                    document.getElementById('verification-form').submit();
                 }
             });
 

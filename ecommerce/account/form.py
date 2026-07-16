@@ -1,154 +1,160 @@
-import re
-from django.contrib.auth.models import User#django built_in User model
+from io import BytesIO
+
+from PIL import Image, UnidentifiedImageError
 from django import forms
-from django.contrib.auth.forms import UserCreationForm#django built_in UserCreationForm
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    UserCreationForm,
+)
+from django.core.exceptions import ValidationError
 
-from django.contrib.auth.forms import AuthenticationForm#django built_in AuthenticationForm
-from django.forms.widgets import PasswordInput, TextInput#PasswordInput and TextInput widgets
-from .models import UserProfile#UserProfile model
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth import authenticate#django built_in authenticate function
-#from django_recaptcha.fields import ReCaptchaField
+from .models import UserProfile
 
-class RegisterForm(UserCreationForm):#RegisterForm class inherits from UserCreationForm
 
-    # captcha = ReCaptchaField()
+User = get_user_model()
+MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024
+ALLOWED_PROFILE_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
+
+def normalize_email(value):
+    return User.objects.normalize_email((value or "").strip()).lower()
+
+
+def validate_unique_email(email, *, exclude_user=None):
+    query = User.objects.filter(email__iexact=email)
+    if exclude_user is not None:
+        query = query.exclude(pk=exclude_user.pk)
+    if query.exists():
+        raise ValidationError("An account with this email already exists.")
+
+
+class RegisterForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
-        #fields to be displayed in the form
+        fields = ("first_name", "last_name", "username", "email", "password1", "password2")
 
     def __init__(self, *args, **kwargs):
-        super(RegisterForm, self).__init__(*args, **kwargs)
-        #calling the __init__ method of the parent class
-
-        self.fields['email'].required = True
-        #email field is required
+        super().__init__(*args, **kwargs)
+        self.fields["email"].required = True
 
     def clean_email(self):
-        email = self.cleaned_data.get('email').lower()
-        #get the email from the form
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Email already exists")
-            #if email already exists in the database
+        email = normalize_email(self.cleaned_data.get("email"))
+        validate_unique_email(email)
         return email
-    
+
     def clean_username(self):
-        username = self.cleaned_data.get('username').lower()
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("Username already exists")
-            #if username already exists in the database
+        username = (self.cleaned_data.get("username") or "").strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError("An account with this username already exists.")
         return username
-    
-    def clean_password2(self):
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
 
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Passwords do not match")
-        if password1:
-            if len(password1) < 8:
-                raise forms.ValidationError("Password must be at least 8 characters long")
-            if not re.search(r'[A-Z]', password1):
-                raise forms.ValidationError("Password must contain at least one uppercase letter")
-            if not re.search(r'[a-z]', password1):
-                raise forms.ValidationError("Password must contain at least one lowercase letter")
-            if not re.search(r'[0-9]', password1):
-                raise forms.ValidationError("Password must contain at least one digit")
-            if not re.search(r'[@$!%*?&]', password1):
-                raise forms.ValidationError("Password must contain at least one special character (@, $, !, %, *, ?, &)")
-        return password2
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        user.username = self.cleaned_data["username"]
+        user.first_name = (self.cleaned_data.get("first_name") or "").strip()
+        user.last_name = (self.cleaned_data.get("last_name") or "").strip()
+        if commit:
+            user.save()
+        return user
 
-class LoginForm(AuthenticationForm):#LoginForm class inherits from AuthenticationForm
 
-    #captcha = ReCaptchaField(required=False)
-
-    username = forms.CharField(widget=TextInput(attrs={'placeholder': 'Username or Email'}), label="Username or Email")
-    password = forms.CharField(widget=PasswordInput(attrs={'placeholder': 'Password'}), label="Password")
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(label="Username or email")
 
     def clean(self):
-        # Get the cleaned data
-        username_or_email = self.cleaned_data.get('username').lower()
-        password = self.cleaned_data.get('password')
-        '''#captcha = self.cleaned_data.get('captcha')
-
-        # Require CAPTCHA if rate limit exceeded (6 attempts per minute)
-        if hasattr(self.request, 'limited') and self.request.limited:
-            if not captcha:
-                raise forms.ValidationError("Please complete the CAPTCHA after multiple failed attempts.")'''
-
-        if username_or_email and password:
-            # Try to authenticate the user
-            user = None
-            # Check if the input is an email
-            if '@' in username_or_email:
-                try:
-                    # Get the user by email
-                    user_obj = User.objects.get(email=username_or_email)
-                    user = authenticate(self.request, username=user_obj.username, password=password)
-                except User.DoesNotExist:
-                    raise forms.ValidationError("Invalid email or password.")
-            else:
-                # Assume the input is a username
-                user = authenticate(self.request, username=username_or_email, password=password)
-
-            if user is None:
-                raise forms.ValidationError("Invalid username/email or password.")
-            
-            # If authentication is successful, store the user in cleaned_data
-            self.cleaned_data['user'] = user
-
+        identifier = (self.cleaned_data.get("username") or "").strip()
+        password = self.cleaned_data.get("password")
+        if identifier and password:
+            self.user_cache = authenticate(
+                self.request,
+                username=identifier,
+                password=password,
+            )
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            self.confirm_login_allowed(self.user_cache)
         return self.cleaned_data
 
-    def get_user(self):
-        # Return the authenticated user
-        return self.cleaned_data.get('user')
 
-    
-class UpdateUserForm(forms.ModelForm):#UpdateUserForm class inherits from forms.ModelForm
-
+class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
-        #fields to be displayed in the form
-        exclude = ['password1', 'password2']
-        #fields to be excluded from the form
+        fields = ("first_name", "last_name", "username", "email")
 
     def __init__(self, *args, **kwargs):
-        super(UpdateUserForm, self).__init__(*args, **kwargs)
-        #calling the __init__ method of the parent class
-
-        self.fields['email'].required = True
-        #email field is required
+        super().__init__(*args, **kwargs)
+        self.fields["email"].required = True
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        #get the email from the form
-        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError("Email already exists")
-            #if email already exists in the database
+        email = normalize_email(self.cleaned_data.get("email"))
+        validate_unique_email(email, exclude_user=self.instance)
         return email
-    
+
     def clean_username(self):
-        username = self.cleaned_data.get('username').lower()
-        #get the username from the form
-        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError("Username already exists")
-            #if username already exists in the database
+        username = (self.cleaned_data.get("username") or "").strip()
+        if User.objects.filter(username__iexact=username).exclude(
+            pk=self.instance.pk
+        ).exists():
+            raise forms.ValidationError("An account with this username already exists.")
         return username
-    
 
-class UserProfileForm(forms.ModelForm):#UpdateProfileForm class inherits from forms.ModelForm
+    def clean_first_name(self):
+        return (self.cleaned_data.get("first_name") or "").strip()
 
+    def clean_last_name(self):
+        return (self.cleaned_data.get("last_name") or "").strip()
+
+
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_picture']
+        fields = ("profile_picture",)
+
+    def clean_profile_picture(self):
+        image = self.cleaned_data.get("profile_picture")
+        if not image:
+            return image
+        if image.size > MAX_PROFILE_IMAGE_SIZE:
+            raise forms.ValidationError("Profile images must be 5 MB or smaller.")
+        content_type = getattr(image, "content_type", "")
+        if content_type not in ALLOWED_PROFILE_IMAGE_TYPES:
+            raise forms.ValidationError("Upload a JPEG, PNG, or WebP image.")
+        try:
+            content = image.read()
+            Image.open(BytesIO(content)).verify()
+            image.seek(0)
+        except (UnidentifiedImageError, OSError, ValueError):
+            raise forms.ValidationError("Upload a valid image file.")
+        return image
 
 
-class CustomPasswordResetForm(PasswordResetForm):
+class PrivatePasswordResetForm(PasswordResetForm):
     def clean_email(self):
-        email = self.cleaned_data['email']
-        if not User.objects.filter(email=email).exists():
-            raise forms.ValidationError("This email is not registered with us.")
-        return email
+        return normalize_email(self.cleaned_data.get("email"))
+
+
+CustomPasswordResetForm = PrivatePasswordResetForm
+
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if self.user is None or not self.user.check_password(password):
+            raise forms.ValidationError("The password is incorrect.")
+        return password
+
+
+class ResendVerificationForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean_email(self):
+        return normalize_email(self.cleaned_data.get("email"))

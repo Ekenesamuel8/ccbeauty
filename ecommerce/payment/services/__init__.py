@@ -14,6 +14,21 @@ from .checkout import (
     checkout_token_is_valid,
     create_checkout_order,
 )
+from .paystack import (
+    PaystackError,
+    PaystackInvalidResponse,
+    PaystackNetworkError,
+    PaystackVerificationError,
+    PaystackVerificationResult,
+    verify_transaction,
+    webhook_signature_is_valid,
+)
+from .payment_processing import (
+    PaymentProcessingError,
+    PaymentProcessingResult,
+    process_verified_payment,
+    reconcile_paid_order_cart,
+)
 
 __all__ = [
     "AddressOwnershipError",
@@ -30,4 +45,15 @@ __all__ = [
     "build_cart_preview",
     "checkout_token_is_valid",
     "create_checkout_order",
+    "PaystackError",
+    "PaystackInvalidResponse",
+    "PaystackNetworkError",
+    "PaystackVerificationError",
+    "PaystackVerificationResult",
+    "verify_transaction",
+    "webhook_signature_is_valid",
+    "PaymentProcessingError",
+    "PaymentProcessingResult",
+    "process_verified_payment",
+    "reconcile_paid_order_cart",
 ]

@@ -1,5 +1,6 @@
 import logging
 import secrets
+import json
 
 from django.conf import settings
 from django.contrib import messages
@@ -7,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from cart.cart import Cart
 from payment.models import Order, Payment, RegisterAddress
@@ -18,11 +20,23 @@ from payment.services.checkout import (
     InvalidCartItemError,
     InvalidCheckoutTokenError,
     InvalidQuantityError,
+    InsufficientStockError,
     MissingAddressError,
     ProductUnavailableError,
     build_cart_preview,
     checkout_token_is_valid,
     create_checkout_order,
+)
+from payment.services.paystack import (
+    PaystackError,
+    verify_transaction,
+    webhook_signature_is_valid,
+)
+from payment.services.payment_processing import (
+    PaymentProcessingError,
+    PaymentNotFoundError,
+    process_verified_payment,
+    reconcile_paid_order_cart,
 )
 
 
@@ -35,16 +49,69 @@ def _new_checkout_token():
     return secrets.token_urlsafe(32)
 
 
-@login_required(login_url="login")
-@require_GET
-def payment_failed(request):
-    return render(request, "payment/payment_failed.html")
+def _owned_payment(request, ref):
+    return (
+        Payment.objects.select_related("order")
+        .filter(ref=ref, user=request.user, order__user=request.user)
+        .first()
+    )
 
 
 @login_required(login_url="login")
 @require_GET
-def payment_success(request):
-    return render(request, "payment/payment_success.html")
+def payment_success(request, ref):
+    payment = _owned_payment(request, ref)
+    if payment is None:
+        messages.error(request, "Payment record not found or access was denied.")
+        return redirect("checkout")
+    if (
+        payment.status != Payment.Status.VERIFIED
+        or payment.order.status not in {Order.Status.PAID, Order.Status.PAID_STOCK_ISSUE}
+    ):
+        return redirect("payment_pending", ref=payment.ref)
+    return render(
+        request,
+        "payment/payment_success.html",
+        {"payment": payment, "order": payment.order},
+    )
+
+
+@login_required(login_url="login")
+@require_GET
+def payment_pending(request, ref):
+    payment = _owned_payment(request, ref)
+    if payment is None:
+        messages.error(request, "Payment record not found or access was denied.")
+        return redirect("checkout")
+    if (
+        payment.status == Payment.Status.VERIFIED
+        and payment.order.status in {Order.Status.PAID, Order.Status.PAID_STOCK_ISSUE}
+    ):
+        return redirect("payment_success", ref=payment.ref)
+    return render(
+        request,
+        "payment/payment_pending.html",
+        {"payment": payment, "order": payment.order},
+    )
+
+
+@login_required(login_url="login")
+@require_GET
+def payment_failed(request, ref):
+    payment = _owned_payment(request, ref)
+    if payment is None:
+        messages.error(request, "Payment record not found or access was denied.")
+        return redirect("checkout")
+    if (
+        payment.status == Payment.Status.VERIFIED
+        and payment.order.status in {Order.Status.PAID, Order.Status.PAID_STOCK_ISSUE}
+    ):
+        return redirect("payment_success", ref=payment.ref)
+    return render(
+        request,
+        "payment/payment_failed.html",
+        {"payment": payment, "order": payment.order},
+    )
 
 
 @login_required(login_url="login")
@@ -123,7 +190,7 @@ def orders(request):
             shipping_address=shipping_address,
             idempotency_key=checkout_token,
         )
-    except (EmptyCartError, InvalidCartItemError, InvalidQuantityError) as exc:
+    except (EmptyCartError, InvalidCartItemError, InvalidQuantityError, InsufficientStockError) as exc:
         messages.error(request, exc.user_message)
         return redirect("cart_summary")
     except ProductUnavailableError as exc:
@@ -191,41 +258,91 @@ def makepayment(request, ref):
 
 
 @login_required(login_url="login")
-@require_GET
+@require_POST
 def verify_payment(request, ref):
+    payment = _owned_payment(request, ref)
+    if payment is None:
+        logger.warning("Browser return ownership/not-found rejection")
+        messages.error(request, "Payment record not found or access was denied.")
+        return redirect("checkout")
+
     try:
-        payment = Payment.objects.select_related("order").get(
-            ref=ref,
-            user=request.user,
+        verification_data = verify_transaction(payment.ref)
+    except PaystackError:
+        logger.warning("Browser verification temporarily unavailable reference=%s", ref)
+        messages.info(
+            request,
+            "Payment confirmation is still pending. You can retry shortly.",
         )
-    except Payment.DoesNotExist:
-        logger.warning("Payment verification ownership/not-found rejection")
-        messages.warning(request, "Payment record not found or access was denied.")
-        return JsonResponse({"error message": "Payment not found"}, status=404)
+        return redirect("payment_pending", ref=payment.ref)
 
-    if not payment.order_id or payment.order.user_id != request.user.id:
-        # Phase 3 will replace this browser-return flow with full verification
-        # hardening and webhook processing. Never guess an order association.
-        messages.warning(request, "Payment has no valid owned order.")
-        return JsonResponse(
-            {"error message": "Payment has no valid order"},
-            status=409,
+    try:
+        result = process_verified_payment(
+            reference=payment.ref,
+            verification_data=verification_data,
         )
+    except (PaymentProcessingError, PaymentNotFoundError):
+        logger.warning("Browser payment processing rejected reference=%s", ref)
+        messages.error(request, "This payment could not be confirmed safely.")
+        return redirect("payment_failed", ref=payment.ref)
 
-    verified = payment.verify_payment()
-    if not verified:
-        messages.warning(request, "Payment verification failed.")
-        return redirect("dashboard")
+    if result.successful:
+        reconcile_paid_order_cart(session=request.session, order=result.order)
+        return redirect("payment_success", ref=result.payment.ref)
+    if result.state == Payment.Status.FAILED:
+        messages.error(request, "The payment was not successful.")
+        return redirect("payment_failed", ref=result.payment.ref)
+    messages.info(request, "Payment confirmation is still pending.")
+    return redirect("payment_pending", ref=result.payment.ref)
 
-    # Existing post-verification compatibility behavior is retained for Phase 3.
-    # The cart is not touched during checkout creation or payment-page rendering.
-    request.session.pop("sess_key", None)
-    order_info = {
-        "id": payment.order.id,
-        "total_cost": payment.order.amount_paid,
-    }
-    context = {
-        "placed_order": order_info,
-        "payment": payment,
-    }
-    return render(request, "payment/payment_success.html", context=context)
+
+@csrf_exempt
+@require_POST
+def paystack_webhook(request):
+    signature = request.headers.get("X-Paystack-Signature")
+    if not webhook_signature_is_valid(request.body, signature):
+        logger.warning("Invalid Paystack webhook signature")
+        return JsonResponse({"status": "invalid signature"}, status=401)
+
+    try:
+        event = json.loads(request.body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        logger.warning("Malformed Paystack webhook JSON")
+        return JsonResponse({"status": "invalid payload"}, status=400)
+
+    if not isinstance(event, dict):
+        return JsonResponse({"status": "invalid payload"}, status=400)
+    event_name = event.get("event")
+    if event_name != "charge.success":
+        logger.info("Unsupported Paystack webhook event=%s", event_name)
+        return JsonResponse({"status": "ignored"})
+
+    data = event.get("data")
+    reference = data.get("reference") if isinstance(data, dict) else None
+    if not isinstance(reference, str) or not reference:
+        return JsonResponse({"status": "invalid payload"}, status=400)
+
+    try:
+        verification_data = verify_transaction(reference)
+    except PaystackError:
+        logger.warning("Webhook verification unavailable reference=%s", reference)
+        return JsonResponse({"status": "verification unavailable"}, status=503)
+
+    try:
+        result = process_verified_payment(
+            reference=reference,
+            verification_data=verification_data,
+        )
+    except PaymentNotFoundError:
+        logger.warning("Webhook ignored unknown reference=%s", reference)
+        return JsonResponse({"status": "ignored"})
+    except PaymentProcessingError:
+        logger.warning("Webhook payment processing rejected reference=%s", reference)
+        return JsonResponse({"status": "rejected"}, status=400)
+
+    return JsonResponse(
+        {
+            "status": "processed",
+            "payment_state": result.state,
+        }
+    )

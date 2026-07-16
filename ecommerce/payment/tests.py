@@ -30,6 +30,7 @@ class CommerceModelTestCase(TestCase):
             price=Decimal("12.50"),
             slug="historical-brush",
             image="images/historical-brush.jpg",
+            stock_quantity=100,
         )
 
     def create_order(self, user=None, amount=Decimal("25.00"), **kwargs):
@@ -75,6 +76,7 @@ class OrderModelTests(CommerceModelTestCase):
                 "cancelled",
                 "refunded",
                 "payment_failed",
+                "paid_stock_issue",
             },
         )
 

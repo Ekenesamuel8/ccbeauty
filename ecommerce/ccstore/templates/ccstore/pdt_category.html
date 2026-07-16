@@ -20,7 +20,7 @@
 
         <div class="col">
           <div class="card bg-white shadow-sm h-100 text-center border-0">
-          <img class="product-card-img img-fluid" alt="Responsive image" src="{{product.image.url}}">
+          <img class="product-card-img img-fluid" alt="{{ product.title }}" src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'media/images/default.png' %}{% endif %}">
 
             <div class="card-body">
               <p class="card-text text-muted text-capitalize">
@@ -28,6 +28,7 @@
               </p>
               <div class="card-price d-flex justify-content-between align-items-center">
                 <h5 class="card-price-p fs-6 fs-sm-5 fs-md-4 fs-lg-3"> &#8358; {{product.price}} </h5>
+                {% if not product.is_available %}<span class="badge bg-secondary">Out of stock</span>{% endif %}
               </div>
             </div>
           </div>
@@ -36,6 +37,7 @@
         <!-- end for -->
 
       </div>
+      {% include "ccstore/pagination.html" with page_obj=products %}
     </div>
   </div>
 

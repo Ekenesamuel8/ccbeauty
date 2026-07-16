@@ -1,0 +1,10 @@
+{% include "ccstore/base.html" %}
+{% block content %}
+<div class="container mt-4"><h1>Order #{{ order.id }}</h1>
+<p>Date: {{ order.date_ordered }}<br>Status: {{ order.get_status_display }}<br>Total: &#8358;{{ order.amount_paid }}</p>
+<table class="table"><thead><tr><th>Item</th><th>Unit price</th><th>Quantity</th><th>Line total</th></tr></thead><tbody>
+{% for item in order.orderitem_set.all %}<tr><td>{{ item.product_title }}</td><td>&#8358;{{ item.price }}</td><td>{{ item.quantity }}</td><td>&#8358;{{ item.line_total }}</td></tr>{% endfor %}
+</tbody></table>
+{% if payment %}<p>Payment: {{ payment.get_status_display }}<br>Reference: {{ payment.ref }}</p>{% endif %}
+<p>Shipping snapshot:<br>{{ order.address1|linebreaksbr }}</p></div>
+{% endblock %}

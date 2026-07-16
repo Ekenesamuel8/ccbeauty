@@ -16,6 +16,8 @@ from payment.services.checkout import (
     InvalidCartItemError,
     InvalidCheckoutTokenError,
     InvalidQuantityError,
+    InsufficientStockError,
+    ProductUnavailableError,
     MissingAddressError,
     ProductUnavailableError,
     create_checkout_order,
@@ -70,6 +72,7 @@ class CheckoutFixtures(TestCase):
             price=Decimal("125.50"),
             slug="current-price-product",
             image="images/current-price-product.jpg",
+            stock_quantity=100,
         )
         cls.second_product = Product.objects.create(
             Category=cls.category,
@@ -77,6 +80,7 @@ class CheckoutFixtures(TestCase):
             price=Decimal("20.00"),
             slug="second-product",
             image="images/second-product.jpg",
+            stock_quantity=100,
         )
 
     def token(self, character="a"):
@@ -103,6 +107,26 @@ class CheckoutFixtures(TestCase):
 
 
 class CheckoutServiceTests(CheckoutFixtures):
+    def test_inactive_product_is_rejected_without_partial_order(self):
+        self.product.is_active = False
+        self.product.save(update_fields=('is_active', 'updated_at'))
+        with self.assertRaises(ProductUnavailableError):
+            self.create_checkout()
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_insufficient_or_stale_stock_is_rejected_without_partial_order(self):
+        self.product.stock_quantity = 1
+        self.product.save(update_fields=('stock_quantity', 'updated_at'))
+        with self.assertRaises(InsufficientStockError):
+            self.create_checkout(cart=self.cart(quantity=2))
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_does_not_deduct_stock_before_payment(self):
+        before = self.product.stock_quantity
+        self.create_checkout()
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock_quantity, before)
+
     def test_empty_cart_is_rejected(self):
         with self.assertRaises(EmptyCartError):
             self.create_checkout(cart={})

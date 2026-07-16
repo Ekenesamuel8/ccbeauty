@@ -1,8 +1,37 @@
+import re
+
 from django import forms
+
 from .models import RegisterAddress
+
 
 class AddressForm(forms.ModelForm):
     class Meta:
         model = RegisterAddress
-        fields = ['fullname', 'email', 'address1', 'address2', 'city', 'state', 'country', 'zipcode', 'phone']
-        exclude = ['user']
+        fields = (
+            "label",
+            "fullname",
+            "email",
+            "phone",
+            "address1",
+            "address2",
+            "city",
+            "state",
+            "zipcode",
+            "country",
+            "is_default",
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        for field in self.Meta.fields:
+            value = cleaned.get(field)
+            if isinstance(value, str):
+                cleaned[field] = value.strip()
+        return cleaned
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get("phone") or "").strip()
+        if not re.fullmatch(r"\+?[0-9][0-9()\-\s]{6,18}", phone):
+            raise forms.ValidationError("Enter a valid phone number.")
+        return phone

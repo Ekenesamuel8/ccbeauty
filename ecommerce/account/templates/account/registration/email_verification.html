@@ -4,9 +4,9 @@ hey!
 
 thanks for signing up for an account with us!
 
-to verify your email address, please click the link below:
+to verify your email address, please use the link below:
 
-https://{{ domain }}{% url 'email_verification' uidb64=uid token=token %}
+{{ verification_url }}
 
 
 {% endautoescape %}

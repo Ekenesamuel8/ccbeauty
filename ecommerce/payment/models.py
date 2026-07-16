@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
 
 from ccstore.models import Product
-from payment.paystack import Paystack
 
 
 class OrderStatus(models.TextChoices):
@@ -18,6 +17,7 @@ class OrderStatus(models.TextChoices):
     CANCELLED = "cancelled", "Cancelled"
     REFUNDED = "refunded", "Refunded"
     PAYMENT_FAILED = "payment_failed", "Payment failed"
+    PAID_STOCK_ISSUE = "paid_stock_issue", "Paid - stock issue"
 
 
 class PaymentStatus(models.TextChoices):
@@ -29,7 +29,16 @@ class PaymentStatus(models.TextChoices):
     REFUNDED = "refunded", "Refunded"
 
 
+class ConfirmationStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    SENDING = "sending", "Sending"
+    SENT = "sent", "Sent"
+    FAILED = "failed", "Failed"
+
+
 class RegisterAddress(models.Model):
+    label = models.CharField(max_length=50, default="Home")
+    is_default = models.BooleanField(default=False)
     fullname = models.CharField(max_length=300)
     email = models.EmailField(max_length=300)
     address1 = models.CharField(max_length=200)
@@ -42,20 +51,67 @@ class RegisterAddress(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+        related_name="shipping_addresses",
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "RegisterAddress"
         verbose_name_plural = "RegisterAddress"
+        ordering = ("-is_default", "id")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user",),
+                condition=models.Q(is_default=True),
+                name="one_default_address_per_user",
+            ),
+        ]
 
     def __str__(self):
         return f"Shipping address - {self.id}"
 
+    def clean(self):
+        super().clean()
+        required = ("fullname", "phone", "address1", "city", "state")
+        for field in required:
+            if not str(getattr(self, field, "") or "").strip():
+                from django.core.exceptions import ValidationError
+
+                raise ValidationError({field: "This field cannot be blank."})
+
+    def save(self, *args, **kwargs):
+        for field in (
+            "label",
+            "fullname",
+            "email",
+            "phone",
+            "address1",
+            "address2",
+            "city",
+            "state",
+            "country",
+            "zipcode",
+        ):
+            value = getattr(self, field, None)
+            if isinstance(value, str):
+                setattr(self, field, value.strip())
+        if self.user_id and not self.is_default:
+            self.is_default = not type(self).objects.filter(
+                user_id=self.user_id,
+                is_default=True,
+            ).exclude(pk=self.pk).exists()
+        if self.user_id and self.is_default:
+            type(self).objects.filter(
+                user_id=self.user_id,
+                is_default=True,
+            ).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)
+
 
 class Order(models.Model):
     Status = OrderStatus
+    ConfirmationStatus = ConfirmationStatus
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -91,6 +147,15 @@ class Order(models.Model):
         editable=False,
         help_text="Durable checkout token; legacy orders remain null.",
     )
+    confirmation_status = models.CharField(
+        max_length=10,
+        choices=ConfirmationStatus.choices,
+        default=ConfirmationStatus.PENDING,
+        db_index=True,
+    )
+    confirmation_sent_at = models.DateTimeField(null=True, blank=True)
+    stock_deducted_at = models.DateTimeField(null=True, blank=True)
+    stock_restored_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ("-date_ordered", "-id")
@@ -132,6 +197,11 @@ class OrderItem(models.Model):
         max_length=250,
         help_text="Immutable product-name snapshot captured when the line is created.",
     )
+    product_sku = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Immutable SKU snapshot captured when the line is created.",
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -165,6 +235,8 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding and not self.product_title and self.product_id:
             self.product_title = self.product.title
+        if self._state.adding and not self.product_sku and self.product_id:
+            self.product_sku = self.product.sku
         super().save(*args, **kwargs)
 
     @property
@@ -202,6 +274,19 @@ class Payment(models.Model):
         default=Status.INITIALIZED,
         db_index=True,
     )
+    provider = models.CharField(max_length=20, default="paystack")
+    provider_transaction_id = models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True,
+    )
+    currency = models.CharField(max_length=3, default="NGN")
+    verified_at = models.DateTimeField(null=True, blank=True)
+    provider_paid_at = models.DateTimeField(null=True, blank=True)
+    provider_channel = models.CharField(max_length=32, blank=True)
+    failure_reason = models.CharField(max_length=255, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ("-date_paid", "-id")
@@ -258,13 +343,3 @@ class Payment(models.Model):
 
     def amount_value(self):
         return int(self.amount_paid * Decimal("100"))
-
-    def verify_payment(self):
-        paystack = Paystack()
-        status, result = paystack.verify_payment(self.ref)
-        if status:
-            paid_amount = Decimal(result["amount"]) / Decimal("100")
-            if paid_amount == self.amount_paid:
-                self.verified = True
-                self.save(update_fields=("status",))
-        return self.verified

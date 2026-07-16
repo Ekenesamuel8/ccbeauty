@@ -17,7 +17,7 @@
                 <a href="{%url 'order_history'%}">Orders</a>
                 <a href="#">Inbox </a>
                 <a href="{%url 'manage_shipping_address'%}">Manage shipping address</a>
-                <a href="{%url 'store'%}">Logout</a>
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="btn btn-link">Logout</button></form>
             </div>
 
             <!-- Main content -->
@@ -38,7 +38,7 @@
                                     class="img-fluid rounded-circle"
                                     style="width: 150px; height: 150px; object-fit: cover;">
                             {% else %}
-                                <img src="{% static 'images/default-profile.jpg' %}" alt="Default Profile"
+                                <img src="{% static 'media/images/default.png' %}" alt="Default Profile"
                                     class="img-fluid rounded-circle"
                                     style="width: 150px; height: 150px; object-fit: cover;">
                             {% endif %}

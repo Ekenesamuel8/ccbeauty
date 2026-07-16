@@ -1,197 +1,287 @@
-[
-{
-  "model": "ccstore.product",
-  "pk": 1,
-  "fields": {
-    "Category": 3,
-    "title": "bamboo brush",
-    "price": "100.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "bamboo-brush",
-    "image": "images/bamboo_brush.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 2,
-  "fields": {
-    "Category": 4,
-    "title": "18 inches ring light",
-    "price": "200.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "18-inches-ring-light",
-    "image": "images/18_inchs_ring_ligth.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 3,
-  "fields": {
-    "Category": 3,
-    "title": "coaster scent brush",
-    "price": "400.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "coaster-scent-brush",
-    "image": "images/coaster_scent_brush.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 4,
-  "fields": {
-    "Category": 1,
-    "title": "eye liner",
-    "price": "50.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "eye-liner",
-    "image": "images/eye_liner.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 5,
-  "fields": {
-    "Category": 1,
-    "title": "geogous me eye shadow",
-    "price": "600.00",
-    "description": "",
-    "brand": "whos that girl",
-    "slug": "geogous-me-eye-shadow",
-    "image": "images/gorgerce_me_52_colors_eye_shadow.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 6,
-  "fields": {
-    "Category": 3,
-    "title": "pink brush",
-    "price": "100.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "pink-brush",
-    "image": "images/pink_brush.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 8,
-  "fields": {
-    "Category": 4,
-    "title": "orange light",
-    "price": "500.00",
-    "description": "portable light for your content creation",
-    "brand": "unbranded",
-    "slug": "orange-light",
-    "image": "images/orange_light.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 9,
-  "fields": {
-    "Category": 4,
-    "title": "order me light",
-    "price": "200.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "order-me-light",
-    "image": "images/order_me_light.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 10,
-  "fields": {
-    "Category": 6,
-    "title": "leg wash",
-    "price": "240.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "leg-wash",
-    "image": "images/leg_washer.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 11,
-  "fields": {
-    "Category": 5,
-    "title": "art foundation",
-    "price": "210.00",
-    "description": "",
-    "brand": "art",
-    "slug": "art-foundation",
-    "image": "images/art_foundation.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 12,
-  "fields": {
-    "Category": 5,
-    "title": "12 in 1 micolor powder",
-    "price": "410.00",
-    "description": "",
-    "brand": "micolor",
-    "slug": "micolor-make-up-powder",
-    "image": "images/micolout_.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 13,
-  "fields": {
-    "Category": 5,
-    "title": "6 in 1 micolor powder",
-    "price": "120.00",
-    "description": "",
-    "brand": "micolor",
-    "slug": "6-in-1-micolor-powder",
-    "image": "images/micolor_6_in_1_powder_palather.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 14,
-  "fields": {
-    "Category": 6,
-    "title": "nail dryer",
-    "price": "25000.00",
-    "description": "",
-    "brand": "unbranded",
-    "slug": "nail-dryer",
-    "image": "images/nial_dryer.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 15,
-  "fields": {
-    "Category": 7,
-    "title": "makeup chair (double tray)",
-    "price": "50000.00",
-    "description": "use to dress a client",
-    "brand": "whos that girl",
-    "slug": "makeup-chair-double-tray",
-    "image": "images/make_up_chair.jpg"
-  }
-},
-{
-  "model": "ccstore.product",
-  "pk": 16,
-  "fields": {
-    "Category": 4,
-    "title": "table ring light",
-    "price": "7000.00",
-    "description": "use for content creation",
-    "brand": "unbranded",
-    "slug": "table-ring-light",
-    "image": "images/table_ring_light.jpg"
-  }
-}
-]
+[
+    {
+        "model":  "ccstore.product",
+        "pk":  1,
+        "fields":  {
+                       "Category":  3,
+                       "title":  "bamboo brush",
+                       "price":  "100.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "bamboo-brush",
+                       "image":  "images/bamboo_brush.jpg",
+                       "sku":  "CCB-000001",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  2,
+        "fields":  {
+                       "Category":  4,
+                       "title":  "18 inches ring light",
+                       "price":  "200.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "18-inches-ring-light",
+                       "image":  "images/18_inchs_ring_ligth.jpg",
+                       "sku":  "CCB-000002",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  3,
+        "fields":  {
+                       "Category":  3,
+                       "title":  "coaster scent brush",
+                       "price":  "400.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "coaster-scent-brush",
+                       "image":  "images/coaster_scent_brush.jpg",
+                       "sku":  "CCB-000003",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  4,
+        "fields":  {
+                       "Category":  1,
+                       "title":  "eye liner",
+                       "price":  "50.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "eye-liner",
+                       "image":  "images/eye_liner.jpg",
+                       "sku":  "CCB-000004",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  5,
+        "fields":  {
+                       "Category":  1,
+                       "title":  "geogous me eye shadow",
+                       "price":  "600.00",
+                       "description":  "",
+                       "brand":  "whos that girl",
+                       "slug":  "geogous-me-eye-shadow",
+                       "image":  "images/gorgerce_me_52_colors_eye_shadow.jpg",
+                       "sku":  "CCB-000005",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  6,
+        "fields":  {
+                       "Category":  3,
+                       "title":  "pink brush",
+                       "price":  "100.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "pink-brush",
+                       "image":  "images/pink_brush.jpg",
+                       "sku":  "CCB-000006",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  8,
+        "fields":  {
+                       "Category":  4,
+                       "title":  "orange light",
+                       "price":  "500.00",
+                       "description":  "portable light for your content creation",
+                       "brand":  "unbranded",
+                       "slug":  "orange-light",
+                       "image":  "images/orange_light.jpg",
+                       "sku":  "CCB-000008",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  9,
+        "fields":  {
+                       "Category":  4,
+                       "title":  "order me light",
+                       "price":  "200.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "order-me-light",
+                       "image":  "images/order_me_light.jpg",
+                       "sku":  "CCB-000009",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  10,
+        "fields":  {
+                       "Category":  6,
+                       "title":  "leg wash",
+                       "price":  "240.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "leg-wash",
+                       "image":  "images/leg_washer.jpg",
+                       "sku":  "CCB-000010",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  11,
+        "fields":  {
+                       "Category":  5,
+                       "title":  "art foundation",
+                       "price":  "210.00",
+                       "description":  "",
+                       "brand":  "art",
+                       "slug":  "art-foundation",
+                       "image":  "images/art_foundation.jpg",
+                       "sku":  "CCB-000011",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  12,
+        "fields":  {
+                       "Category":  5,
+                       "title":  "12 in 1 micolor powder",
+                       "price":  "410.00",
+                       "description":  "",
+                       "brand":  "micolor",
+                       "slug":  "micolor-make-up-powder",
+                       "image":  "images/micolout_.jpg",
+                       "sku":  "CCB-000012",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  13,
+        "fields":  {
+                       "Category":  5,
+                       "title":  "6 in 1 micolor powder",
+                       "price":  "120.00",
+                       "description":  "",
+                       "brand":  "micolor",
+                       "slug":  "6-in-1-micolor-powder",
+                       "image":  "images/micolor_6_in_1_powder_palather.jpg",
+                       "sku":  "CCB-000013",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  14,
+        "fields":  {
+                       "Category":  6,
+                       "title":  "nail dryer",
+                       "price":  "25000.00",
+                       "description":  "",
+                       "brand":  "unbranded",
+                       "slug":  "nail-dryer",
+                       "image":  "images/nial_dryer.jpg",
+                       "sku":  "CCB-000014",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  15,
+        "fields":  {
+                       "Category":  7,
+                       "title":  "makeup chair (double tray)",
+                       "price":  "50000.00",
+                       "description":  "use to dress a client",
+                       "brand":  "whos that girl",
+                       "slug":  "makeup-chair-double-tray",
+                       "image":  "images/make_up_chair.jpg",
+                       "sku":  "CCB-000015",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    },
+    {
+        "model":  "ccstore.product",
+        "pk":  16,
+        "fields":  {
+                       "Category":  4,
+                       "title":  "table ring light",
+                       "price":  "7000.00",
+                       "description":  "use for content creation",
+                       "brand":  "unbranded",
+                       "slug":  "table-ring-light",
+                       "image":  "images/table_ring_light.jpg",
+                       "sku":  "CCB-000016",
+                       "is_active":  true,
+                       "stock_quantity":  25,
+                       "low_stock_threshold":  5,
+                       "created_at":  "2026-01-01T00:00:00Z",
+                       "updated_at":  "2026-01-01T00:00:00Z"
+                   }
+    }
+]

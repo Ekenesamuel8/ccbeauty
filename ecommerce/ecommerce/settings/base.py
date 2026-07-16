@@ -116,6 +116,13 @@ MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+DEFAULT_FROM_EMAIL = env_value(
+    "DEFAULT_FROM_EMAIL",
+    "EMAIL_HOST_USER",
+    "EMAIL_HOST_USERS",
+    default="webmaster@localhost",
+)
+
 # Optional during ordinary development; production validates both values.
 PAYSTACK_PUBLIC_KEY = env_value("PAYSTACK_PUBLIC_KEY", default="")
 PAYSTACK_SECRET_KEY = env_value("PAYSTACK_SECRET_KEY", default="")
@@ -136,6 +143,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesBackend",
+    "account.auth_backend.EmailOrUsernameModelBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 
@@ -150,4 +158,3 @@ AXES_LOCK_OUT_BY_USER = True
 AXES_LOCK_OUT_BY_IP = False
 AXES_FAILURE_LIMIT = 5
 AXES_RESET_ON_SUCCESS = True
-

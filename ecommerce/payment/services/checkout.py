@@ -32,6 +32,10 @@ class ProductUnavailableError(CheckoutError):
     user_message = "A product in your cart is no longer available."
 
 
+class InsufficientStockError(CheckoutError):
+    user_message = "A product in your cart does not have enough stock. Please adjust your cart."
+
+
 class InvalidQuantityError(CheckoutError):
     user_message = "A cart quantity is invalid. Choose between 1 and 99."
 
@@ -131,6 +135,15 @@ def _load_current_lines(parsed_cart, *, lock=False):
     lines = []
     for product_id, quantity in parsed_cart.items():
         product = products_by_id[product_id]
+        if not product.is_active:
+            logger.warning("Checkout rejected inactive product_id=%s sku=%s", product.id, product.sku)
+            raise ProductUnavailableError
+        if quantity > product.stock_quantity:
+            logger.warning(
+                "Checkout rejected insufficient stock product_id=%s sku=%s requested=%s available=%s",
+                product.id, product.sku, quantity, product.stock_quantity,
+            )
+            raise InsufficientStockError
         unit_price = Decimal(product.price)
         if unit_price < 0:
             logger.warning("Checkout rejected because a current product price is invalid")
@@ -270,6 +283,7 @@ def create_checkout_order(
                         order=order,
                         product=line.product,
                         product_title=line.product.title,
+                        product_sku=line.product.sku,
                         user=user,
                         quantity=line.quantity,
                         price=line.unit_price,

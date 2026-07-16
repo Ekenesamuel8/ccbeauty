@@ -1,0 +1,19 @@
+{% include "ccstore/base.html" %}
+{% block content %}
+<body>
+  <div class="login-card">
+    <div class="login-header"></div>
+    <div class="login-body text-center">
+      <h3>Payment confirmation pending</h3>
+      <p>We have not confirmed payment for order #{{ order.id }} yet.</p>
+      <p>Your reference is {{ payment.ref }}. You may retry safely.</p>
+      <form method="post" action="{% url 'verify_payment' payment.ref %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Retry verification</button>
+      </form>
+      <a href="{% url 'makepayment' payment.ref %}" class="btn btn-link">Return to payment</a>
+    </div>
+  </div>
+</body>
+{% endblock content %}
+
