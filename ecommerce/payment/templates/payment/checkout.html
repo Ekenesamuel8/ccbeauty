@@ -47,14 +47,15 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <p class="text-bold">Subtotal:</p>
-                            <p><strong>&#8358;{{ cart.get_total_price }}</strong></p>
+                            <p><strong>&#8358;{{ total_cost }}</strong></p>
                         </div>
                     </div>
                     <div class="card-footer text-center">
-                        <form id="form">
-                            
-                        <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
-
+                        <form method="post" action="{% url 'orders' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+                            <input type="hidden" name="address_id" value="{{ shipping_address.id }}">
+                            <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
                         </form>
                     </div>  
                 </div>              
@@ -65,49 +66,4 @@
 
     </body>
     
-    <script>
-   
-        $ (document).on('submit', function(e){
-    
-            e.preventDefault();
-
-            $('#complete-order').prop('disabled', true).text('Processing...');
-    
-            $.ajax({
-    
-                type: 'POST',
-    
-                url: '{% url "orders" %}',
-    
-                data: {
-    
-                    fullname: "{{ shipping_address.fullname }}",
-                    email: "{{ shipping_address.email }}",
-                    address1: "{{ shipping_address.address1 }}",
-                    address2: "{{ shipping_address.address2 }}",
-                    city: "{{ shipping_address.city }}",
-                    state: "{{ shipping_address.state }}",
-                    zipcode: "{{ shipping_address.zipcode }}",
-
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-    
-                    action: 'post'
-    
-                }, 
-                success: function(json){
-                    window.location.replace('{% url "makepayment" %}');
-                
-                },
-    
-                error: function(xhr, errmsg, err){
-
-                    window.location.replace('{% url "checkout" %}');
-    
-                }
-    
-            });
-        })
-    </script>
-
-
 {% endblock %}
