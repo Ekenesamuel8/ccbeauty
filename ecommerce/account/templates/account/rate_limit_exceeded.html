@@ -1,12 +1,1 @@
-{% include "ccstore/base.html" %}
-
-{% load static %}
-{% block content %}
-  <h2>Too Many Requests</h2>
-  <p>You've exceeded the request limit. Please try again in a minute.</p>
-  {% if messages %}
-    {% for message in messages %}
-      <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-    {% endfor %}
-  {% endif %}
-{% endblock %}
+{% extends "base.html" %}{% block title %}Too many requests | CCbeauty{% endblock %}{% block content %}<section class="form-card"><h1>Too many requests</h1><p>Please wait a minute before trying again.</p><a href="{% url 'store' %}">Return to the store</a></section>{% endblock %}

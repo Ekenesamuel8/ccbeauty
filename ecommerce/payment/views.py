@@ -147,6 +147,7 @@ def checkout(request):
         "shipping_address": shipping_address,
         "total_cost": preview.total,
         "total_items": preview.total_quantity,
+        "cart_lines": preview.lines,
         "checkout_token": checkout_token,
     }
     return render(request, "payment/checkout.html", context=context)

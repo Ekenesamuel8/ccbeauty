@@ -38,6 +38,12 @@ class RegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
+        self.fields["email"].widget.attrs["autocomplete"] = "email"
+        self.fields["username"].widget.attrs["autocomplete"] = "username"
+        self.fields["first_name"].widget.attrs["autocomplete"] = "given-name"
+        self.fields["last_name"].widget.attrs["autocomplete"] = "family-name"
+        self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
+        self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
 
     def clean_email(self):
         email = normalize_email(self.cleaned_data.get("email"))
@@ -64,6 +70,11 @@ class RegisterForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label="Username or email")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs["autocomplete"] = "username"
+        self.fields["password"].widget.attrs["autocomplete"] = "current-password"
+
     def clean(self):
         identifier = (self.cleaned_data.get("username") or "").strip()
         password = self.cleaned_data.get("password")
@@ -87,6 +98,10 @@ class UpdateUserForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
+        self.fields["email"].widget.attrs["autocomplete"] = "email"
+        self.fields["username"].widget.attrs["autocomplete"] = "username"
+        self.fields["first_name"].widget.attrs["autocomplete"] = "given-name"
+        self.fields["last_name"].widget.attrs["autocomplete"] = "family-name"
 
     def clean_email(self):
         email = normalize_email(self.cleaned_data.get("email"))
@@ -140,7 +155,7 @@ CustomPasswordResetForm = PrivatePasswordResetForm
 
 
 class DeleteAccountForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}))
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -154,7 +169,7 @@ class DeleteAccountForm(forms.Form):
 
 
 class ResendVerificationForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"autocomplete": "email"}))
 
     def clean_email(self):
         return normalize_email(self.cleaned_data.get("email"))

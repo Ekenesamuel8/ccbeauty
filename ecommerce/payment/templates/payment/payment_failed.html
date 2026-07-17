@@ -1,15 +1,1 @@
-{% include "ccstore/base.html" %}
-{% block content %}
-<body>
-  <div class="login-card">
-    <div class="login-header"></div>
-    <div class="login-body text-center">
-      <h3>Payment not confirmed</h3>
-      <p>Payment for order #{{ order.id }} was not confirmed.</p>
-      <p>Reference: {{ payment.ref }}</p>
-      <a href="{% url 'checkout' %}" class="btn btn-primary">Start a new checkout</a>
-      <a href="{% url 'cart_summary' %}" class="btn btn-link">Return to cart</a>
-    </div>
-  </div>
-</body>
-{% endblock content %}
+{% extends "base.html" %}{% block title %}Payment not confirmed | CCbeauty{% endblock %}{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}{% block content %}<section class="form-card text-center"><h1>Payment not confirmed</h1><p>Payment for order #{{ order.id }} was not confirmed.</p><p>Reference: {{ payment.ref }}</p><div class="form-actions justify-content-center"><a class="btn btn-primary" href="{% url 'checkout' %}">Start a new checkout</a><a class="btn btn-outline-secondary" href="{% url 'cart_summary' %}">Return to cart</a></div></section>{% endblock %}

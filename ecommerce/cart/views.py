@@ -47,10 +47,19 @@ def _available_product(product_id, quantity):
 # Create your views here.
 
 def cart_summary(request):
-
-    cart = Cart(request)#create cart object
-
-    return render(request, 'cart/cart_summary.html', {'cart': cart})#render cart summary page
+    cart = Cart(request)
+    cart_items = list(cart)
+    cart_is_valid = bool(cart_items) and len(cart_items) == len(cart.cart) and all(
+        item.get('product')
+        and item['product'].is_active
+        and item['product_qty'] <= item['product'].stock_quantity
+        for item in cart_items
+    )
+    return render(
+        request,
+        'cart/cart_summary.html',
+        {'cart': cart, 'cart_items': cart_items, 'cart_is_valid': cart_is_valid},
+    )
 
 @require_POST
 def add_cart(request):

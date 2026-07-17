@@ -1,10 +1,1 @@
-{% include "ccstore/base.html" %}
-{% block content %}
-<div class="container mt-4"><h1>Order #{{ order.id }}</h1>
-<p>Date: {{ order.date_ordered }}<br>Status: {{ order.get_status_display }}<br>Total: &#8358;{{ order.amount_paid }}</p>
-<table class="table"><thead><tr><th>Item</th><th>Unit price</th><th>Quantity</th><th>Line total</th></tr></thead><tbody>
-{% for item in order.orderitem_set.all %}<tr><td>{{ item.product_title }}</td><td>&#8358;{{ item.price }}</td><td>{{ item.quantity }}</td><td>&#8358;{{ item.line_total }}</td></tr>{% endfor %}
-</tbody></table>
-{% if payment %}<p>Payment: {{ payment.get_status_display }}<br>Reference: {{ payment.ref }}</p>{% endif %}
-<p>Shipping snapshot:<br>{{ order.address1|linebreaksbr }}</p></div>
-{% endblock %}
+{% extends "base.html" %}{% block title %}Order #{{ order.id }} | CCbeauty{% endblock %}{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}{% block content %}<div class="container py-4"><div class="account-layout">{% include "partials/account_sidebar.html" %}<section><h1>Order #{{ order.id }}</h1><dl class="row"><dt class="col-sm-3">Date</dt><dd class="col-sm-9">{{ order.date_ordered }}</dd><dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ order.get_status_display }}</dd><dt class="col-sm-3">Total</dt><dd class="col-sm-9">&#8358;{{ order.amount_paid }}</dd></dl><div class="table-responsive"><table class="table"><thead><tr><th>Item snapshot</th><th>SKU snapshot</th><th>Unit price</th><th>Quantity</th><th>Line total</th></tr></thead><tbody>{% for item in order.orderitem_set.all %}<tr><td>{{ item.product_title }}</td><td>{{ item.product_sku|default:"—" }}</td><td>&#8358;{{ item.price }}</td><td>{{ item.quantity }}</td><td>&#8358;{{ item.line_total }}</td></tr>{% endfor %}</tbody></table></div><h2 class="h5">Shipping snapshot</h2><address>{{ order.fullname }}<br>{{ order.email }}<br>{{ order.address1|linebreaksbr }}</address>{% if payment %}<h2 class="h5">Payment</h2><p>{{ payment.get_status_display }} · Reference {{ payment.ref }}</p>{% endif %}</section></div></div>{% endblock %}

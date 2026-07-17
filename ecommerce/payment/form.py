@@ -21,6 +21,17 @@ class AddressForm(forms.ModelForm):
             "country",
             "is_default",
         )
+        widgets = {
+            "email": forms.EmailInput(attrs={"autocomplete": "email"}),
+            "phone": forms.TextInput(attrs={"type": "tel", "autocomplete": "tel"}),
+            "fullname": forms.TextInput(attrs={"autocomplete": "name"}),
+            "address1": forms.TextInput(attrs={"autocomplete": "address-line1"}),
+            "address2": forms.TextInput(attrs={"autocomplete": "address-line2"}),
+            "city": forms.TextInput(attrs={"autocomplete": "address-level2"}),
+            "state": forms.TextInput(attrs={"autocomplete": "address-level1"}),
+            "zipcode": forms.TextInput(attrs={"autocomplete": "postal-code"}),
+            "country": forms.TextInput(attrs={"autocomplete": "country-name"}),
+        }
 
     def clean(self):
         cleaned = super().clean()

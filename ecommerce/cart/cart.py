@@ -45,6 +45,7 @@ class Cart():
 
         for product in products:#iterate over products
             cart[str(product.id)]['product'] = product #add product object to cart
+            cart[str(product.id)]['price'] = str(product.price)
 
         for item in cart.values():#iterate over cart values
             item['price'] = Decimal(item['price'])#convert price to decimal
@@ -53,8 +54,16 @@ class Cart():
 
 
     def get_total_price(self):
-        #calculate total price of all items in cart
-        return sum(Decimal(item['price']) * item['product_qty'] for item in self.cart.values())
+        product_ids = self.cart.keys()
+        current_prices = {
+            str(product.id): product.price
+            for product in Product.objects.filter(id__in=product_ids)
+        }
+        return sum(
+            Decimal(current_prices[product_id]) * item['product_qty']
+            for product_id, item in self.cart.items()
+            if product_id in current_prices
+        )
         
 
     def delete(self, product):

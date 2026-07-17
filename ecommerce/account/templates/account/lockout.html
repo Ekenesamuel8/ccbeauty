@@ -1,9 +1,1 @@
-{% include "ccstore/base.html" %}
-
-{% load static %}
-
-{% block content %}
-  <h2>Account Locked</h2>
-  <p>You've exceeded the login attempt limit. Please try again in 20 minutes or contact support.</p>
-  <a href="{% url 'password_reset' %}">Reset Password</a>
-{% endblock %}
+{% extends "base.html" %}{% block title %}Account temporarily locked | CCbeauty{% endblock %}{% block content %}<section class="form-card"><h1>Account temporarily locked</h1><p>Too many login attempts were made. Please wait before trying again or reset your password.</p><a href="{% url 'password_reset' %}">Reset password</a></section>{% endblock %}

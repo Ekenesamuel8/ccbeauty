@@ -1,9 +1,1 @@
-{% include "ccstore/base.html" %}
-{% block content %}
-<div class="container mt-4"><h1>Order history</h1>
-  <table class="table"><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead><tbody>
-  {% for order in orders %}<tr><td>#{{ order.id }}</td><td>{{ order.date_ordered }}</td><td>{{ order.get_status_display }}</td><td>&#8358;{{ order.amount_paid }}</td><td><a href="{% url 'order_detail' order.id %}">View</a></td></tr>
-  {% empty %}<tr><td colspan="5">You have no orders yet.</td></tr>{% endfor %}
-  </tbody></table>
-</div>
-{% endblock %}
+{% extends "base.html" %}{% block title %}Order history | CCbeauty{% endblock %}{% block robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}{% block content %}<div class="container py-4"><div class="account-layout">{% include "partials/account_sidebar.html" %}<section><h1>Order history</h1>{% if orders %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th><th><span class="visually-hidden">Action</span></th></tr></thead><tbody>{% for order in orders %}<tr><td>#{{ order.id }}</td><td>{{ order.date_ordered|date:"j M Y" }}</td><td><span class="status-badge">{{ order.get_status_display }}</span></td><td>&#8358;{{ order.amount_paid }}</td><td><a href="{% url 'order_detail' order.id %}">View order</a></td></tr>{% endfor %}</tbody></table></div>{% else %}{% url 'store' as shop_url %}{% include "partials/empty_state.html" with empty_title="You have no orders yet" empty_message="Your completed checkouts will appear here." empty_url=shop_url %}{% endif %}</section></div></div>{% endblock %}
