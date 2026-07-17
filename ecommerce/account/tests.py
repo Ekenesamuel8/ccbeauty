@@ -120,7 +120,7 @@ class ProfileTests(AccountFixtureTests):
         user = self.create_user()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard"))
-        self.assertContains(response, "media/images/default.png")
+        self.assertContains(response, "media/images/ccbeauty_logo.jpg")
 
 
 class AddressTests(AccountFixtureTests):

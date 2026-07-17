@@ -1,9 +1,25 @@
-{% extends "base.html" %}
-{% block title %}Shop beauty products | CCbeauty{% endblock %}
-{% block meta_description %}Browse active beauty products available from CCbeauty.{% endblock %}
+{% extends "base.html" %}{% load static %}
+{% block title %}Beauty essentials & professional tools | CCbeauty{% endblock %}
+{% block meta_description %}Shop makeup, beauty essentials, lighting and professional tools from CCbeauty.{% endblock %}
+{% block og_title %}Beauty essentials & professional tools | CCbeauty{% endblock %}
 {% block content %}
-<section class="container py-4"><h1 class="mb-4">All products</h1>
-  {% if my_products %}<div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 g-3">{% for product in my_products %}<div class="col">{% include "partials/product_card.html" %}</div>{% endfor %}</div>{% include "partials/pagination.html" with page_obj=my_products %}
+<section class="hero"><div class="container"><div class="row align-items-center g-5"><div class="col-lg-7 position-relative">
+  <p class="eyebrow">Beauty, thoughtfully selected</p><h1 class="hero-title">Build a routine that feels like you.</h1><p class="hero-copy mt-4">Explore makeup essentials, beauty tools and studio equipment with clear availability and secure checkout.</p>
+  <div class="d-flex flex-wrap gap-3 mt-4"><a class="btn btn-brand btn-lg" href="#catalog">Shop the collection</a>{% if featured_categories %}<a class="btn btn-soft btn-lg" href="{{ featured_categories.0.get_absolute_url }}">Browse {{ featured_categories.0.name|capfirst }}</a>{% endif %}</div>
+</div><div class="col-lg-5"><div class="hero-visual"><img src="{% static 'media/images/art_foundation.jpg' %}" alt="A selection of foundation products" width="720" height="720" fetchpriority="high"></div></div></div></div></section>
+
+<section class="trust-strip" aria-label="Shopping benefits"><div class="container"><div class="row row-cols-1 row-cols-md-3">
+  <div class="col"><div class="trust-item"><i class="fa fa-check-circle-o" aria-hidden="true"></i><div><strong>Live availability</strong><span>Current stock is checked at checkout</span></div></div></div>
+  <div class="col"><div class="trust-item"><i class="fa fa-lock" aria-hidden="true"></i><div><strong>Secure payment</strong><span>Protected checkout powered by Paystack</span></div></div></div>
+  <div class="col"><div class="trust-item"><i class="fa fa-history" aria-hidden="true"></i><div><strong>Order clarity</strong><span>Track your order status from your account</span></div></div></div>
+</div></div></section>
+
+{% if featured_categories %}<section class="section-space"><div class="container"><p class="eyebrow">Find your category</p><div class="catalog-header"><div><h2 class="section-heading">Shop by collection</h2><p class="section-intro">From everyday makeup to the tools behind professional results.</p></div></div><div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">{% for category in featured_categories %}<div class="col"><a class="category-tile" href="{{ category.get_absolute_url }}"><i class="fa fa-star-o" aria-hidden="true"></i><span>{{ category.active_product_count }} product{{ category.active_product_count|pluralize }}</span><strong>{{ category.name|capfirst }}</strong></a></div>{% endfor %}</div></div></section>{% endif %}
+
+{% if featured_products %}<section class="section-space-sm bg-white"><div class="container"><div class="catalog-header"><div><p class="eyebrow">Fresh arrivals</p><h2 class="section-heading">Recently added</h2></div><a href="#catalog">View the full collection <span aria-hidden="true">&rarr;</span></a></div><div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4">{% for product in featured_products %}<div class="col">{% include "partials/product_card.html" %}</div>{% endfor %}</div></div></section>{% endif %}
+
+<section class="section-space" id="catalog"><div class="container"><div class="catalog-header"><div><p class="eyebrow">The collection</p><h2 class="section-heading">All products</h2><p class="section-intro">{{ my_products.paginator.count }} item{{ my_products.paginator.count|pluralize }} currently in our active catalog.</p></div></div>
+  {% if my_products %}<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4">{% for product in my_products %}<div class="col">{% include "partials/product_card.html" %}</div>{% endfor %}</div>{% include "partials/pagination.html" with page_obj=my_products %}
   {% else %}{% url 'store' as shop_url %}{% include "partials/empty_state.html" with empty_title="No products available" empty_message="Please check back soon." empty_url=shop_url %}{% endif %}
-</section>
+</div></section>
 {% endblock %}

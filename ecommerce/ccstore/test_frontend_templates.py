@@ -92,7 +92,7 @@ class FrontendTemplateTests(TestCase):
         self.assertNotContains(response, "Add to cart")
 
     def test_search_pagination_preserves_query(self):
-        for number in range(12):
+        for number in range(13):
             Product.objects.create(
                 Category=self.category, title=f"Template extra {number:02d}",
                 slug=f"template-extra-{number}", sku=f"TPL-X-{number}", price="1.00",
@@ -170,3 +170,58 @@ class FrontendTemplateTests(TestCase):
         self.assertContains(response, f"order #{self.order.id}", html=False)
         self.assertContains(response, "Staff review required")
         self.assertNotContains(response, "stock was allocated")
+
+    def test_homepage_has_deliberate_sections_and_hides_inactive_products(self):
+        response = self.client.get(reverse("store"))
+        self.assertContains(response, 'class="hero"', html=False)
+        self.assertContains(response, "Shop by collection")
+        self.assertContains(response, "Recently added")
+        self.assertContains(response, self.product.title)
+        self.assertNotContains(response, self.inactive.title)
+
+    def test_product_cards_show_stock_states_and_valid_fallback(self):
+        low_stock = Product.objects.create(
+            Category=self.category, title="Last Brush", slug="last-brush", sku="TPL-LOW",
+            price="12.00", image="", stock_quantity=1, low_stock_threshold=2,
+        )
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertContains(response, "Low stock")
+        self.assertContains(response, "Out of stock")
+        self.assertContains(response, "media/images/ccbeauty_logo.jpg")
+        self.assertContains(response, low_stock.get_absolute_url(), count=2)
+
+    def test_related_products_exclude_current_and_inactive(self):
+        related = Product.objects.create(
+            Category=self.category, title="Related Brush", slug="related-brush",
+            sku="TPL-RELATED", price="15.00", image="images/pink_brush.jpg", stock_quantity=2,
+        )
+        response = self.client.get(self.product.get_absolute_url())
+        related_section = response.content.decode().split("Related products", 1)[1]
+        self.assertIn(related.title, related_section)
+        self.assertNotIn(self.product.title, related_section)
+        self.assertNotIn(self.inactive.title, related_section)
+
+    def test_sorting_is_validated_and_pagination_keeps_selected_sort(self):
+        for number in range(13):
+            Product.objects.create(
+                Category=self.category, title=f"Sorted {number:02d}",
+                slug=f"sorted-{number}", sku=f"SORT-{number}", price=number + 1,
+                image="images/pink_brush.jpg", stock_quantity=1,
+            )
+        response = self.client.get(reverse("search"), {"q": "Sorted", "sort": "price_desc"})
+        self.assertEqual(response.context["selected_sort"], "price_desc")
+        self.assertContains(response, "page=2&amp;sort=price_desc")
+        invalid = self.client.get(self.category.get_absolute_url(), {"sort": "__unsafe"})
+        self.assertEqual(invalid.context["selected_sort"], "name")
+
+    def test_private_and_search_pages_include_robots_metadata(self):
+        self.login()
+        for url in (reverse("dashboard"), reverse("checkout"), reverse("order_history")):
+            if url == reverse("checkout"):
+                self.cart_session()
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), 'content="noindex,nofollow"', html=False)
+        self.assertContains(
+            self.client.get(reverse("search"), {"q": "Template"}),
+            'content="noindex,follow"', html=False,
+        )

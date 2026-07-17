@@ -1,13 +1,17 @@
-<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark" aria-label="Primary navigation">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'store' %}">CCbeauty</a>
-    <a class="nav-link position-relative me-3" href="{% url 'cart_summary' %}" aria-label="Shopping cart with {{ cart|length }} items">
-      <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-      <span id="cart_qty" class="badge bg-dark">{{ cart|length|default:0 }}</span>
-    </a>
+{% load static %}
+<div class="announcement-bar">Beauty essentials and professional tools, thoughtfully selected.</div>
+<header class="site-header">
+<nav class="navbar navbar-expand-lg" aria-label="Primary navigation">
+  <div class="container">
+    <a class="navbar-brand brand-lockup" href="{% url 'store' %}"><img src="{% static 'media/images/ccbeauty_logo.jpg' %}" width="42" height="42" alt=""><span>CCbeauty</span></a>
+    <div class="d-flex align-items-center gap-2 order-lg-3">
+      <a class="header-action" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" aria-label="{% if user.is_authenticated %}My account{% else %}Log in{% endif %}"><i class="fa fa-user-o" aria-hidden="true"></i><span class="d-none d-md-inline">Account</span></a>
+      <a class="header-action cart-action" href="{% url 'cart_summary' %}" aria-label="Shopping cart with {{ cart|length }} items"><i class="fa fa-shopping-bag" aria-hidden="true"></i><span class="d-none d-md-inline">Cart</span><span id="cart_qty" class="cart-count">{{ cart|length|default:0 }}</span></a>
+    </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav" aria-controls="primaryNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-    <div class="collapse navbar-collapse" id="primaryNav">
-      <ul class="navbar-nav me-auto">
+    <div class="collapse navbar-collapse order-lg-2" id="primaryNav">
+      <ul class="navbar-nav ms-lg-4">
+        <li class="nav-item"><a class="nav-link" href="{% url 'store' %}">Shop</a></li>
         <li class="nav-item dropdown">
           <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</button>
           <ul class="dropdown-menu">
@@ -16,21 +20,20 @@
           </ul>
         </li>
       </ul>
-      <form class="d-flex my-2 my-lg-0 me-lg-3" method="get" action="{% url 'search' %}" role="search">
+      <form class="header-search ms-lg-auto my-3 my-lg-0" method="get" action="{% url 'search' %}" role="search">
         <label class="visually-hidden" for="global-search">Search products</label>
-        <input id="global-search" class="form-control me-2" type="search" name="q" value="{{ query|default:'' }}" placeholder="Search products">
-        <button class="btn btn-light" type="submit">Search</button>
+        <input id="global-search" class="form-control" type="search" name="q" value="{{ query|default:'' }}" placeholder="Search products, brands or SKU">
+        <button class="btn search-button" type="submit" aria-label="Search"><i class="fa fa-search" aria-hidden="true"></i></button>
       </form>
-      <ul class="navbar-nav align-items-lg-center">
+      <ul class="navbar-nav account-links ms-lg-3">
         {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}" href="{% url 'dashboard' %}">Account</a></li>
           <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'order_history' %} active{% endif %}" href="{% url 'order_history' %}">Orders</a></li>
           <li class="nav-item"><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-link border-0 bg-transparent" type="submit">Logout</button></form></li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
         {% endif %}
       </ul>
     </div>
   </div>
 </nav>
+</header>

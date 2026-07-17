@@ -1,0 +1,26 @@
+html { scroll-behavior: smooth; }
+body { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-body); line-height: 1.6; }
+main { min-height: 55vh; }
+h1, h2, h3, h4, .display-title { color: var(--color-ink); font-family: var(--font-display); font-weight: 600; line-height: 1.15; }
+a { color: var(--color-brand-dark); text-decoration-thickness: .08em; text-underline-offset: .18em; }
+a:hover { color: var(--color-brand); }
+img { max-width: 100%; }
+.container { max-width: var(--container-max); }
+.section-space { padding-block: clamp(3.25rem, 7vw, 6rem); }
+.section-space-sm { padding-block: clamp(2rem, 4vw, 3.5rem); }
+.eyebrow { color: var(--color-brand); font-size: .75rem; font-weight: 700; letter-spacing: .14em; margin-bottom: .75rem; text-transform: uppercase; }
+.section-heading { font-size: clamp(1.8rem, 4vw, 3rem); }
+.section-intro { color: var(--color-muted); max-width: 42rem; }
+.skip-link { background: var(--color-ink); color: white; left: 1rem; padding: .6rem 1rem; position: fixed; top: -6rem; z-index: 1100; }
+.skip-link:focus { color: white; top: 1rem; }
+:focus-visible { outline: 3px solid rgba(155, 95, 69, .45); outline-offset: 3px; }
+.btn { border-radius: var(--radius-sm); font-weight: 650; padding: .7rem 1rem; transition: transform var(--transition), box-shadow var(--transition), background var(--transition); }
+.btn:hover { transform: translateY(-1px); }
+.btn-brand, .btn-primary { background: var(--color-brand); border-color: var(--color-brand); color: #fff; }
+.btn-brand:hover, .btn-primary:hover, .btn-brand:focus, .btn-primary:focus { background: var(--color-brand-dark); border-color: var(--color-brand-dark); color: #fff; }
+.btn-soft { background: var(--color-brand-soft); border-color: transparent; color: var(--color-brand-dark); }
+.btn-soft:hover { background: #e8d2c5; color: var(--color-brand-dark); }
+.form-control, .form-select { border-color: var(--color-border); border-radius: var(--radius-sm); min-height: 46px; }
+.form-control:focus, .form-select:focus { border-color: var(--color-brand); box-shadow: 0 0 0 .2rem rgba(155,95,69,.14); }
+.text-muted { color: var(--color-muted) !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }

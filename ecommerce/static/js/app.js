@@ -9,6 +9,10 @@
 
   async function submitCartForm(form) {
     const feedback = form.closest("section")?.querySelector(".cart-feedback") || document.getElementById("cart-feedback");
+    if (form.getAttribute("aria-busy") === "true") return;
+    const submitButton = form.querySelector('[type="submit"]');
+    form.setAttribute("aria-busy", "true");
+    if (submitButton) submitButton.disabled = true;
     try {
       const response = await fetch(form.dataset.url || form.action, {
         method: "POST",
@@ -27,6 +31,9 @@
       }
     } catch (error) {
       showFeedback(feedback, error.message || "The cart could not be updated.");
+    } finally {
+      form.removeAttribute("aria-busy");
+      if (submitButton) submitButton.disabled = false;
     }
   }
 
@@ -53,23 +60,48 @@
         showFeedback(feedback, "This payment cannot be initialized safely.");
         return;
       }
-      const handler = window.PaystackPop.setup({
-        key: button.dataset.key,
-        email: button.dataset.email,
-        amount,
-        ref: button.dataset.reference,
-        onClose: () => { window.location.assign(button.dataset.pendingUrl); },
-        callback: () => {
-          const verificationForm = document.getElementById("verification-form");
-          if (verificationForm) verificationForm.submit();
-        },
+      try {
+        const handler = window.PaystackPop.setup({
+          key: button.dataset.key,
+          email: button.dataset.email,
+          amount,
+          ref: button.dataset.reference,
+          onClose: () => { window.location.assign(button.dataset.pendingUrl); },
+          callback: () => {
+            const verificationForm = document.getElementById("verification-form");
+            if (verificationForm) verificationForm.submit();
+          },
+        });
+        button.disabled = true;
+        button.setAttribute("aria-busy", "true");
+        handler.openIframe();
+      } catch (error) {
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        showFeedback(feedback, "The secure payment dialog could not open. Please refresh and try again.");
+      }
+    });
+  }
+
+  function initializeAutoSubmit() {
+    document.querySelectorAll("[data-auto-submit]").forEach((control) => {
+      control.addEventListener("change", () => control.form?.submit());
+    });
+  }
+
+  function initializeGalleryThumbnails() {
+    document.querySelectorAll(".gallery-thumbnail").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.parentElement?.querySelectorAll(".gallery-thumbnail").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
       });
-      handler.openIframe();
     });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     initializeCartForms();
     initializePaystack();
+    initializeAutoSubmit();
+    initializeGalleryThumbnails();
   });
 })();
